@@ -90,6 +90,7 @@ const interReportSchema = new mongoose.Schema({
 })
 
 
+
 const interviewModel = mongoose.model('InterviewReport', interReportSchema)
 
 

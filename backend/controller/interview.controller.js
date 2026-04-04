@@ -80,19 +80,31 @@ async function getAllInterviewReportController(req, res) {
   }
 }
 
-// async function generatePDFController(req, res) {
-//   const { interviewId } = req.params;
-//   const interViewReport = await interViewReportModel.findOne({ _id: interviewId, user: req.user.id });
-//   if (!interViewReport) {
-//     return res.status(404).json({
-//       message: "Interview report not found",
-//     });
-//   }
-//   const {}
-// }
+async function generatePDFController(req, res) {
+  const { id } = req.params;
+  const interViewReport = await interViewReportModel.findById(id);
+  if (!interViewReport) {
+    return res.status(404).json({
+      message: "Interview report not found",
+    });
+  }
+  const { resume, selfDescription, jobDescription } = interViewReport;
+  const pdfBuffer = await generatePDF({
+    resume,
+    selfDescription,
+    jobDescription,
+  });
+
+  res.set({
+    "Content-Type": "application/pdf",
+    "Content-Disposition": `attachment; filename=resume_${id}.pdf`,
+  });
+
+  res.send(pdfBuffer);
+}
 
 export {
   generateInterViewReportController,
   gernrateInterviewReportIdController,
-  getAllInterviewReportController
+  getAllInterviewReportController,
 };

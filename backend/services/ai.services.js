@@ -1,9 +1,8 @@
 import { GoogleGenAI } from "@google/genai";
 import { OpenRouter } from "@openrouter/sdk";
+import puppeteer from "puppeteer"
 
-const ai = new GoogleGenAI({
-  apiKey: process.env.GEMINI_API_KEY,
-});
+
 
 const openrouter = new OpenRouter({
   apiKey: process.env.OPENROUTE_API_KEY,
@@ -184,28 +183,7 @@ export async function generateInterviewReport({
   return mapped;
 }
 
-// export async function main({ resume, selfDescription, jobDescription }) {
-
-//     const prompt = `You are an expert career coach. Based on the following job description, resume, and self-description, generate a comprehensive interview report that includes:
-//                     ${resume ? `1. A list of technical questions that are likely to be asked during the interview, along with the intention behind each question and a sample answer based on the candidate's resume and self-description.` : ''}
-//                     ${selfDescription ? `2. A list of behavioral questions that are likely to be asked during the interview, along with the intention behind each question and a sample answer based on the candidate's self-description.` : ''}
-//                     ${jobDescription ? `3. An analysis of the candidate's skill gaps based on the job description, along with the severity of each gap (Low, Medium, High).` : ''}
-
-//     `
-//     try {
-//         const response = await ai.models.generateContent({
-//             model: "gemini-2.5-flash-lite",
-//             contents: prompt,
-//             config: {
-//                 responseMimeType: "application/json",
-//                 responseJsonSchema: zodToJsonSchema(interviewReportSchema, "InterviewReport"),
-//             }
-//         });
-//         const result = interviewReportSchema.parse(JSON.parse(response.text));
-//         console.log(result);
-
-//     } catch (error) {
-//         console.log('AI Error: ', error);
-//         throw error
-//     }
-// }
+async function generatePDFtoHTML(htmlContent){
+  const browser = await puppeteer.launch()
+  const page = await browser.newPage()
+}
