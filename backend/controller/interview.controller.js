@@ -1,5 +1,8 @@
 import { PDFParse } from "pdf-parse";
-import { generateInterviewReport } from "../services/ai.services.js";
+import {
+  generateInterviewReport,
+  generateInterviewReportPDF,
+} from "../services/ai.services.js";
 import interViewReportModel from "../model/interview.model.js";
 
 async function generateInterViewReportController(req, res) {
@@ -80,31 +83,41 @@ async function getAllInterviewReportController(req, res) {
   }
 }
 
-async function generatePDFController(req, res) {
-  const { id } = req.params;
-  const interViewReport = await interViewReportModel.findById(id);
-  if (!interViewReport) {
-    return res.status(404).json({
-      message: "Interview report not found",
+async function generateInterviewReportPDFController(req, res) {
+  try {
+    const { id } = req.params;
+    const interviewReport = await interViewReportModel.findById(id);
+
+    if (!interviewReport) {
+      return res.status(404).json({ message: "Interview report not found" });
+    }
+
+    const { resume, selfDescription, jobDescription } = interviewReport;
+
+    const pdfBuffer = await generateInterviewReportPDF({
+      resume,
+      selfDescription,
+      jobDescription,
+    });
+
+    res.set({
+      "Content-Type": "application/pdf",
+      "Content-Disposition": `attachment; filename=resume_${id}.pdf`,
+    });
+
+    res.send(pdfBuffer);
+  } catch (error) {
+    console.error("Error generating interview report PDF:", error);
+    res.status(500).json({
+      message: "An error occurred while generating the interview report PDF.",
+      error: error.message,
     });
   }
-  const { resume, selfDescription, jobDescription } = interViewReport;
-  const pdfBuffer = await generatePDF({
-    resume,
-    selfDescription,
-    jobDescription,
-  });
-
-  res.set({
-    "Content-Type": "application/pdf",
-    "Content-Disposition": `attachment; filename=resume_${id}.pdf`,
-  });
-
-  res.send(pdfBuffer);
 }
 
 export {
   generateInterViewReportController,
   gernrateInterviewReportIdController,
   getAllInterviewReportController,
+  generateInterviewReportPDFController,
 };

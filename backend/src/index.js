@@ -1,23 +1,27 @@
-import express from "express"
-import user from '../routes/user.routes.js'
-import page from '../routes/page.routes.js'
-import interView from '../routes/interview.routes.js'
-import cors from 'cors'
+import express from "express";
+import path from "path";
+import user from '../routes/user.routes.js';
+import page from '../routes/page.routes.js';
+import interView from '../routes/interview.routes.js';
+import cors from 'cors';
 
-const app = express()
-app.use(express.json())
+const app = express();
+
+
+// Middleware
+app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
 app.use(cors({
-    origin: 'http://localhost:5173',
+    origin: true,
     credentials: true
-}))
+}));
 
-app.use('/api', user)
-app.use('/api', page)
-app.use('/api', interView)
 
-app.get("/", (req, res)=> {
-    res.send("hello")
-})
 
-export default app
+// ✅ API routes
+app.use('/api', user);
+app.use('/api', page);
+app.use('/api', interView);
+
+export default app;

@@ -1,5 +1,5 @@
 import React, { useState } from "react"
-import { authRegister } from "../services/api.auth"
+import { authRegister } from "../services/api.auth.js"
 import { useNavigate } from "react-router"
 
 const Register = () => {
@@ -10,6 +10,7 @@ const Register = () => {
   })
   const [loading, setLoading] = useState(false)
   const navigate = useNavigate()
+
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -22,16 +23,13 @@ const Register = () => {
 
     try {
       setLoading(true)
-      const data = await authRegister(
+      await authRegister(
         formData.name,
         formData.email,
         formData.password
       )
       navigate('/')
-      
       console.log("Registration successful")
-
-
     } catch (error) {
       console.log(error.response?.data?.message || "Registration failed")
     } finally {
@@ -40,67 +38,76 @@ const Register = () => {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-100">
-      <div className="w-full max-w-md bg-white shadow-lg rounded-xl px-8 py-10">
-        <h1 className="text-2xl font-bold text-slate-800 mb-6 text-center">
-          Register
-        </h1>
+    <main className="register-page w-full min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-slate-50 font-sans flex items-center justify-center px-4 py-10">
+      <div className="relative w-full max-w-md overflow-hidden rounded-3xl border border-white/10 bg-white/5 shadow-[0_18px_60px_rgba(15,23,42,0.75)] backdrop-blur-xl p-8">
+        <div className="pointer-events-none absolute inset-0 opacity-40 mix-blend-screen bg-[radial-gradient(circle_at_top,_#4f46e5_0,_transparent_45%),_radial-gradient(circle_at_bottom,_#22c55e_0,_transparent_45%)]" />
 
-        <form className="space-y-5" onSubmit={handleSubmit}>
-          <div className="flex flex-col gap-1">
-            <label className="text-sm font-medium text-slate-700">
-              Name
-            </label>
-            <input
-              name="name"
-              type="text"
-              value={formData.name}
-              onChange={handleChange}
-              className="border border-slate-300 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              placeholder="Enter your name"
-            />
-          </div>
+        <div className="relative space-y-6">
+          <header className="space-y-2 text-center">
+            <h1 className="text-2xl font-semibold text-slate-50">
+              Create your account
+            </h1>
+            <p className="text-sm text-slate-400">
+              Sign up to generate personalized, role‑ready interview plans.
+            </p>
+          </header>
 
-          <div className="flex flex-col gap-1">
-            <label className="text-sm font-medium text-slate-700">
-              Email
-            </label>
-            <input
-              name="email"
-              type="email"
-              value={formData.email}
-              onChange={handleChange}
-              className="border border-slate-300 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              placeholder="Enter your email"
-            />
-          </div>
+          <form className="space-y-4" onSubmit={handleSubmit}>
+            <div className="space-y-1 text-left">
+              <label className="block text-xs font-medium uppercase tracking-[0.16em] text-slate-400">
+                Name
+              </label>
+              <input
+                name="name"
+                type="text"
+                value={formData.name}
+                onChange={handleChange}
+                className="w-full rounded-xl border border-slate-700 bg-slate-900/80 px-3 py-2.5 text-sm text-slate-100 placeholder:text-slate-500 focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/60"
+                placeholder="Your full name"
+              />
+            </div>
 
-          <div className="flex flex-col gap-1">
-            <label className="text-sm font-medium text-slate-700">
-              Password
-            </label>
-            <input
-              name="password"
-              type="password"
-              value={formData.password}
-              onChange={handleChange}
-              className="border border-slate-300 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              placeholder="Enter your password"
-            />
-          </div>
+            <div className="space-y-1 text-left">
+              <label className="block text-xs font-medium uppercase tracking-[0.16em] text-slate-400">
+                Email
+              </label>
+              <input
+                name="email"
+                type="email"
+                value={formData.email}
+                onChange={handleChange}
+                className="w-full rounded-xl border border-slate-700 bg-slate-900/80 px-3 py-2.5 text-sm text-slate-100 placeholder:text-slate-500 focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/60"
+                placeholder="you@example.com"
+              />
+            </div>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full mt-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 rounded-lg text-sm transition-colors"
-          >
-            {
-              loading ? "Registering..." : "Register"
-            }
-          </button>
-        </form>
+            <div className="space-y-1 text-left">
+              <label className="block text-xs font-medium uppercase tracking-[0.16em] text-slate-400">
+                Password
+              </label>
+              <input
+                name="password"
+                type="password"
+                value={formData.password}
+                onChange={handleChange}
+                className="w-full rounded-xl border border-slate-700 bg-slate-900/80 px-3 py-2.5 text-sm text-slate-100 placeholder:text-slate-500 focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/60"
+                placeholder="Create a strong password"
+              />
+            </div>
+
+            <div className="pt-2 flex justify-end">
+              <button
+                type="submit"
+                disabled={loading}
+                className="inline-flex items-center justify-center rounded-2xl bg-gradient-to-r from-indigo-500 via-sky-500 to-emerald-400 px-4 py-2.5 text-sm font-medium text-white shadow-lg shadow-indigo-500/40 hover:from-indigo-400 hover:via-sky-400 hover:to-emerald-300 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-2 focus:ring-offset-slate-950 disabled:opacity-60 disabled:cursor-not-allowed"
+              >
+                {loading ? "Creating account..." : "Create account"}
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
-    </div>
+    </main>
   )
 }
 

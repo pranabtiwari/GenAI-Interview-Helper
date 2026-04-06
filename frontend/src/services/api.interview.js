@@ -43,3 +43,13 @@ export function getAllInterviewReports() {
     return response
 }
 
+export function generateInterviewReportPDF(interviewId) {
+    const token = localStorage.getItem('token');
+    const response = API_BASE_URL.post(`resume/pdf/${interviewId}`, null, {
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+        responseType: "blob",
+    })
+    return response
+}
