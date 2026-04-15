@@ -4,6 +4,7 @@ import Login from './pages/Login'
 import Home from './pages/Home'
 import { ProtectedRoutes } from './components/protectedRoutes'
 import Interview from './pages/interview'
+import Allresult from './pages/Allresult'
 
 
 export const router = createBrowserRouter([
@@ -31,6 +32,14 @@ export const router = createBrowserRouter([
       </ProtectedRoutes>
     )
   },
+    {
+      path: 'results',
+      element: (
+        <ProtectedRoutes>
+          <Allresult />
+        </ProtectedRoutes>
+      )
+    },
   {
     path: '/logout',
     element: <h1> logout </h1>

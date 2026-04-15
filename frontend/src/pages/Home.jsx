@@ -184,6 +184,13 @@ export default function Home() {
               >
                 {loading ? "Generating your plan..." : "Generate interview plan"}
               </button>
+              <button
+                type="button"
+                className="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-slate-700 bg-slate-950/70 px-4 py-2 text-xs font-medium text-slate-100 hover:bg-slate-900/80"
+                onClick={() => navigate('/results')}
+              >
+                View all previous reports
+              </button>
               <p className="mt-2 text-[0.7rem] text-slate-500 text-center">
                 We don’t store your resume after generating the report.
               </p>

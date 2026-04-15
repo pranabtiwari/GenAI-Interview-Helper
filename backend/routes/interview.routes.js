@@ -5,14 +5,9 @@ import upload from "../middleware/files.middleware.js";
 
 const interviewRoute = Router();
 
-interviewRoute.post(
-  "/interview",
-  authMiddleware,
-  upload.single("resume"),
-  generateInterViewReportController,
-);
+interviewRoute.post("/interview",authMiddleware,upload.single("resume"),generateInterViewReportController);
 interviewRoute.get("/interview/:id", authMiddleware, gernrateInterviewReportIdController);
-interviewRoute.get("/", authMiddleware, getAllInterviewReportController);
+interviewRoute.get("/interview", authMiddleware, getAllInterviewReportController);
 interviewRoute.post("/resume/pdf/:id", authMiddleware, generateInterviewReportPDFController)
 
 export default interviewRoute;

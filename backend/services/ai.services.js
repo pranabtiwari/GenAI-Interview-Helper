@@ -1,5 +1,5 @@
 import { OpenRouter } from "@openrouter/sdk";
-import puppeteer from "puppeteer-core";
+import puppeteer from "puppeteer";
 
 const openrouter = new OpenRouter({
   apiKey: process.env.OPENROUTE_API_KEY,
@@ -162,18 +162,51 @@ export async function generateInterviewReport({
 
   const content = response.choices[0].message.content;
 
-  // Handle both "array of parts" and "string" cases
-  const jsonText = Array.isArray(content) ? content[0].text : content;
-  const aiData = JSON.parse(jsonText);
+  // Normalize to a raw string we expect to be JSON
+  let raw = "";
+  if (Array.isArray(content)) {
+    raw = content[0]?.text ?? "";
+  } else if (typeof content === "string") {
+    raw = content;
+  } else if (content && typeof content === "object") {
+    // Already structured
+    if (typeof content.html === "string") {
+      parsedContent = content;
+    } else {
+      raw = JSON.stringify(content);
+    }
+  }
+
+  let parsedContent = parsedContent; // may already be set above
+
+  if (!parsedContent) {
+    try {
+      // First attempt: parse whole string
+      parsedContent = JSON.parse(raw);
+    } catch {
+      // Fallback: try to extract JSON substring between first { and last }
+      const start = raw.indexOf("{");
+      const end = raw.lastIndexOf("}");
+      if (start !== -1 && end > start) {
+        const jsonSlice = raw.slice(start, end + 1);
+        parsedContent = JSON.parse(jsonSlice);
+      } else {
+        console.error("OpenRouter resume_html non-JSON response:", raw);
+        throw new Error(
+          "Model did not return valid JSON for resume_html. Please try again."
+        );
+      }
+    }
+  }
 
   // Map AI fields → schema fields
   const mapped = {
-    matchScore: aiData.matchScore,
-    techniQuestion: aiData.technicalQuestions,
-    behavQuestion: aiData.behavioralQuestions,
-    skillGaps: aiData.skillGaps,
-    preparationPlan: aiData.preparationPlan,
-    title: aiData.title,
+    matchScore: parsedContent.matchScore,
+    techniQuestion: parsedContent.technicalQuestions,
+    behavQuestion: parsedContent.behavioralQuestions,
+    skillGaps: parsedContent.skillGaps,
+    preparationPlan: parsedContent.preparationPlan,
+    title: parsedContent.title,
   };
 
   console.log("AI mapped data:", mapped);
@@ -181,31 +214,33 @@ export async function generateInterviewReport({
 }
 
 async function generatePDFFromHTML(htmlContent) {
-    let browser;
+  let browser;
 
-    try {
-      browser = await puppeteer.launch({
-        executablePath: "/usr/bin/chromium-browser", // Adjust this path if necessary
-      });
-      const page = await browser.newPage();
-      await page.setContent(htmlContent, { waitUntil: "networkidle0" });
+  try {
+    browser = await puppeteer.launch({
+      headless: true,
+      args: ["--no-sandbox", "--disable-setuid-sandbox"],
+    });
 
-      const pdfBuffer = await page.pdf({
-        format: "A4",
-        margin: {
-          top: "20mm",
-          bottom: "20mm",
-          left: "15mm",
-          right: "15mm",
-        },
-      });
+    const page = await browser.newPage();
+    await page.setContent(htmlContent, { waitUntil: "networkidle0" });
 
-      return pdfBuffer;
-    } finally {
-      if (browser) {
-        await browser.close();
-      }
+    const pdfBuffer = await page.pdf({
+      format: "A4",
+      margin: {
+        top: "20mm",
+        bottom: "20mm",
+        left: "15mm",
+        right: "15mm",
+      },
+    });
+
+    return pdfBuffer;
+  } finally {
+    if (browser) {
+      await browser.close();
     }
+  }
 }
 
 export async function generateInterviewReportPDF({
