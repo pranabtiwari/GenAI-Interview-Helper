@@ -5,7 +5,9 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "dev": "npx nodemon ./server.js"
+    "dev": "npx nodemon ./server.js",
+    "start": "node ./server.js",
+    "build": "npm install --prefix ../frontend && npm run build --prefix ../frontend && rm -rf ./public/* && cp -r ../frontend/dist/* ./public/"
   },
   "keywords": [],
   "author": "",
