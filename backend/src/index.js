@@ -28,14 +28,14 @@ app.use('/api', user);
 app.use('/api', page);
 app.use('/api', interView);
 
-// app.use(express.static(publicDir));
+app.use(express.static(publicDir));
 
-// app.get((req, res, next) => {
-//     if (req.originalUrl.startsWith("/api")) {
-//         return next();
-//     }
+app.get((req, res, next) => {
+    if (req.originalUrl.startsWith("/api")) {
+        return next();
+    }
 
-//     return res.sendFile(path.join(publicDir, "index.html"));
-// });
+    return res.sendFile(path.join(publicDir, "index.html"));
+});
 
 export default app;
