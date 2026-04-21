@@ -1,8 +1,9 @@
 import axios from "axios"
 
 
+const API_BASE_URL_VALUE = import.meta.env.VITE_API_BASE_URL;
 const API_BASE_URL = axios.create({
-    baseURL: 'http://localhost:3000/api/',
+    baseURL: API_BASE_URL_VALUE,
     withCredentials: true
 })
 
@@ -13,7 +14,7 @@ export async function authRegister(name, email, password){
             name, email, password
         })
         localStorage.setItem('token', response.data.token)
-        return response
+        return response.data
     }catch (error) {
         console.error('Registration failed:', error)
         throw error
@@ -38,12 +39,13 @@ export async function authLogin(email, password){
 
 export async function authLogout(){
     try {
-        const response = await axios.post('auth/logout')
-        localStorage.removeItem('token')
+        const response = await API_BASE_URL.delete('auth/logout')
         return response.data
     } catch (error) {
         console.log('Logout error', error);
         throw error
+    } finally {
+        localStorage.removeItem('token')
     }
 }
 

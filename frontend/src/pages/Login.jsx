@@ -76,14 +76,26 @@ const Login = () => {
                             />
                         </div>
 
-                        <div className="pt-2 flex justify-end">
-                            <button
-                                type="submit"
-                                disabled={loading}
-                                className="inline-flex items-center justify-center rounded-2xl bg-gradient-to-r from-indigo-500 via-sky-500 to-emerald-400 px-4 py-2.5 text-sm font-medium text-white shadow-lg shadow-indigo-500/40 hover:from-indigo-400 hover:via-sky-400 hover:to-emerald-300 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-2 focus:ring-offset-slate-950 disabled:opacity-60 disabled:cursor-not-allowed"
-                            >
-                                {loading ? "Logging in..." : "Login"}
-                            </button>
+                        <div className='flex justify-end gap-4'>
+                            <div>
+                                <button
+                                    type="button"
+                                    onClick={() => navigate("/register")}
+                                    disabled={loading}
+                                    className="inline-flex items-center justify-center rounded-2xl border border-slate-700 bg-slate-900/70 px-4 py-2.5 text-sm font-medium text-slate-100 hover:bg-slate-800/80 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-slate-950 disabled:opacity-60 disabled:cursor-not-allowed"
+                                >
+                                    Register
+                                </button>
+                            </div>
+                            <div>
+                                <button
+                                    type="submit"
+                                    disabled={loading}
+                                    className="inline-flex items-center justify-center rounded-2xl bg-gradient-to-r from-indigo-500 via-sky-500 to-emerald-400 px-4 py-2.5 text-sm font-medium text-white shadow-lg shadow-indigo-500/40 hover:from-indigo-400 hover:via-sky-400 hover:to-emerald-300 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-2 focus:ring-offset-slate-950 disabled:opacity-60 disabled:cursor-not-allowed"
+                                >
+                                    {loading ? "Logging in..." : "Login"}
+                                </button>
+                            </div>
                         </div>
                     </form>
                 </div>

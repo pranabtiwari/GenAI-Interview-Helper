@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router";
+import { useNavigate } from "react-router";
 import { getInterviewReportById, generateInterviewReportPDF } from "../services/api.interview.js";
 
 const severityClass = (severity) => {
@@ -21,6 +22,8 @@ const scoreRingClass = (score) => {
 
 const Interview = () => {
   const { interviewId } = useParams();
+  const navigate = useNavigate();
+  const [activeSection, setActiveSection] = useState("technical");
   const [report, setReport] = useState(null);
   const [loading, setLoading] = useState(true);
   const [downloading, setDownloading] = useState(false);
@@ -98,18 +101,26 @@ const Interview = () => {
   const ringClass = scoreRingClass(report.matchScore || 0);
 
   return (
-    <main className="w-full min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-slate-50 font-sans flex items-center justify-center px-4 py-10">
-      <div className="relative flex w-full max-w-5xl mx-auto rounded-3xl border border-white/10 bg-white/5 shadow-[0_18px_60px_rgba(15,23,42,0.75)] backdrop-blur-xl overflow-hidden">
+    <main className="w-full min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-slate-50 font-sans flex items-stretch justify-center px-4 py-4">
+      <div className="relative flex w-full max-w-6xl h-[calc(100vh-2rem)] mx-auto rounded-3xl border border-white/10 bg-white/5 shadow-[0_18px_60px_rgba(15,23,42,0.75)] backdrop-blur-xl overflow-hidden">
         <div className="pointer-events-none absolute inset-0 opacity-40 mix-blend-screen bg-[radial-gradient(circle_at_top,_#4f46e5_0,_transparent_45%),_radial-gradient(circle_at_bottom,_#22c55e_0,_transparent_45%)]" />
 
-        {/* Left nav (static) */}
+        {/* Left nav */}
         <nav className="relative w-56 flex-shrink-0 p-7 flex flex-col justify-between gap-1 border-r border-slate-800/70 bg-slate-950/60">
           <div>
             <p className="text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-slate-500 mb-3 px-3">
               Sections
             </p>
 
-            <button className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-2xl text-sm text-slate-50 bg-slate-900/70 border border-slate-700/80">
+            <button
+              type="button"
+              onClick={() => setActiveSection("technical")}
+              className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-2xl text-sm border transition-colors ${
+                activeSection === "technical"
+                  ? "text-slate-50 bg-slate-900/70 border-slate-700/80"
+                  : "text-slate-400 hover:bg-slate-900/70 hover:text-slate-50 border-transparent hover:border-slate-700/80"
+              }`}
+            >
               <span className="flex items-center">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -129,7 +140,15 @@ const Interview = () => {
               Technical questions
             </button>
 
-            <button className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-2xl text-sm text-slate-400 hover:bg-slate-900/70 hover:text-slate-50 mt-1.5 transition-colors border border-transparent hover:border-slate-700/80">
+            <button
+              type="button"
+              onClick={() => setActiveSection("behavioral")}
+              className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-2xl text-sm mt-1.5 transition-colors border ${
+                activeSection === "behavioral"
+                  ? "text-slate-50 bg-slate-900/70 border-slate-700/80"
+                  : "text-slate-400 hover:bg-slate-900/70 hover:text-slate-50 border-transparent hover:border-slate-700/80"
+              }`}
+            >
               <span className="flex items-center">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -148,7 +167,15 @@ const Interview = () => {
               Behavioral questions
             </button>
 
-            <button className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-2xl text-sm text-slate-400 hover:bg-slate-900/70 hover:text-slate-50 mt-1.5 transition-colors border border-transparent hover:border-slate-700/80">
+            <button
+              type="button"
+              onClick={() => setActiveSection("roadmap")}
+              className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-2xl text-sm mt-1.5 transition-colors border ${
+                activeSection === "roadmap"
+                  ? "text-slate-50 bg-slate-900/70 border-slate-700/80"
+                  : "text-slate-400 hover:bg-slate-900/70 hover:text-slate-50 border-transparent hover:border-slate-700/80"
+              }`}
+            >
               <span className="flex items-center">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -177,143 +204,146 @@ const Interview = () => {
           </button>
         </nav>
 
-        {/* Center content: show all sections (no nav logic) */}
-        <section className="relative flex-1 px-8 py-7 overflow-y-auto max-h-[calc(100vh-4rem)] space-y-8 bg-slate-950/50 border-r border-slate-800/70">
-          {/* Technical Questions */}
-          <div>
-            <div className="flex items-baseline gap-2 mb-4 pb-3 border-b border-slate-800/70">
-              <h2 className="text-[1.05rem] font-semibold text-slate-50">
-                Technical questions
-              </h2>
-              <span className="text-xs text-slate-300 bg-slate-900/70 px-2 py-0.5 rounded-2xl border border-slate-700/80">
-                {technicalQuestions.length} questions
-              </span>
-            </div>
-            <div className="flex flex-col gap-3">
-              {technicalQuestions.map((q, i) => (
-                <div
-                  key={i}
-                  className="bg-slate-900/70 border border-slate-800/80 rounded-2xl overflow-hidden"
-                >
-                  <div className="flex items-start gap-3 px-4 py-3">
-                    <span className="text-[0.7rem] font-semibold text-emerald-300 bg-emerald-400/10 border border-emerald-400/40 rounded-full px-2 py-0.5 mt-0.5">
-                      Q{i + 1}
-                    </span>
-                    <p className="flex-1 text-sm font-medium text-slate-50 leading-relaxed">
-                      {q.question}
-                    </p>
-                  </div>
-                  <div className="px-4 pb-3 pt-2 border-t border-slate-800/80 space-y-3">
-                    <div className="space-y-1">
-                      <span className="inline-flex text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-indigo-300 bg-indigo-500/10 border border-indigo-400/40 rounded px-2 py-0.5">
-                        Intention
+        {/* Center content */}
+        <section className="relative flex-1 px-8 py-7 bg-slate-950/50 border-r border-slate-800/70 overflow-y-auto">
+          {activeSection === "technical" && (
+            <div className="pr-1">
+              <div className="flex items-baseline gap-2 mb-4 pb-3 border-b border-slate-800/70">
+                <h2 className="text-[1.05rem] font-semibold text-slate-50">
+                  Technical questions
+                </h2>
+                <span className="text-xs text-slate-300 bg-slate-900/70 px-2 py-0.5 rounded-2xl border border-slate-700/80">
+                  {technicalQuestions.length} questions
+                </span>
+              </div>
+              <div className="flex flex-col gap-3">
+                {technicalQuestions.map((q, i) => (
+                  <div
+                    key={i}
+                    className="bg-slate-900/70 border border-slate-800/80 rounded-2xl overflow-hidden"
+                  >
+                    <div className="flex items-start gap-3 px-4 py-3">
+                      <span className="text-[0.7rem] font-semibold text-emerald-300 bg-emerald-400/10 border border-emerald-400/40 rounded-full px-2 py-0.5 mt-0.5">
+                        Q{i + 1}
                       </span>
-                      <p className="text-[0.84rem] text-slate-300 leading-relaxed">
-                        {q.intention}
+                      <p className="flex-1 text-sm font-medium text-slate-50 leading-relaxed">
+                        {q.question}
                       </p>
                     </div>
-                    <div className="space-y-1">
-                      <span className="inline-flex text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-emerald-300 bg-emerald-400/10 border border-emerald-400/40 rounded px-2 py-0.5">
-                        Model Answer
-                      </span>
-                      <p className="text-[0.84rem] text-slate-300 leading-relaxed">
-                        {q.answer}
-                      </p>
+                    <div className="px-4 pb-3 pt-2 border-t border-slate-800/80 space-y-3">
+                      <div className="space-y-1">
+                        <span className="inline-flex text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-indigo-300 bg-indigo-500/10 border border-indigo-400/40 rounded px-2 py-0.5">
+                          Intention
+                        </span>
+                        <p className="text-[0.84rem] text-slate-300 leading-relaxed">
+                          {q.intention}
+                        </p>
+                      </div>
+                      <div className="space-y-1">
+                        <span className="inline-flex text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-emerald-300 bg-emerald-400/10 border border-emerald-400/40 rounded px-2 py-0.5">
+                          Model Answer
+                        </span>
+                        <p className="text-[0.84rem] text-slate-300 leading-relaxed">
+                          {q.answer}
+                        </p>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
-          </div>
+          )}
 
-          {/* Behavioral Questions */}
-          <div>
-            <div className="flex items-baseline gap-2 mb-4 pb-3 border-b border-slate-800/70">
-              <h2 className="text-[1.05rem] font-semibold text-slate-50">
-                Behavioral questions
-              </h2>
-              <span className="text-xs text-slate-300 bg-slate-900/70 px-2 py-0.5 rounded-2xl border border-slate-700/80">
-                {behavioralQuestions.length} questions
-              </span>
-            </div>
-            <div className="flex flex-col gap-3">
-              {behavioralQuestions.map((q, i) => (
-                <div
-                  key={i}
-                  className="bg-slate-900/70 border border-slate-800/80 rounded-2xl overflow-hidden"
-                >
-                  <div className="flex items-start gap-3 px-4 py-3">
-                    <span className="text-[0.7rem] font-semibold text-sky-300 bg-sky-400/10 border border-sky-400/40 rounded-full px-2 py-0.5 mt-0.5">
-                      Q{i + 1}
-                    </span>
-                    <p className="flex-1 text-sm font-medium text-slate-50 leading-relaxed">
-                      {q.question}
-                    </p>
-                  </div>
-                  <div className="px-4 pb-3 pt-2 border-t border-slate-800/80 space-y-3">
-                    <div className="space-y-1">
-                      <span className="inline-flex text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-indigo-300 bg-indigo-500/10 border border-indigo-400/40 rounded px-2 py-0.5">
-                        Intention
+          {activeSection === "behavioral" && (
+            <div className="pr-1">
+              <div className="flex items-baseline gap-2 mb-4 pb-3 border-b border-slate-800/70">
+                <h2 className="text-[1.05rem] font-semibold text-slate-50">
+                  Behavioral questions
+                </h2>
+                <span className="text-xs text-slate-300 bg-slate-900/70 px-2 py-0.5 rounded-2xl border border-slate-700/80">
+                  {behavioralQuestions.length} questions
+                </span>
+              </div>
+              <div className="flex flex-col gap-3">
+                {behavioralQuestions.map((q, i) => (
+                  <div
+                    key={i}
+                    className="bg-slate-900/70 border border-slate-800/80 rounded-2xl overflow-hidden"
+                  >
+                    <div className="flex items-start gap-3 px-4 py-3">
+                      <span className="text-[0.7rem] font-semibold text-sky-300 bg-sky-400/10 border border-sky-400/40 rounded-full px-2 py-0.5 mt-0.5">
+                        Q{i + 1}
                       </span>
-                      <p className="text-[0.84rem] text-slate-300 leading-relaxed">
-                        {q.intention}
+                      <p className="flex-1 text-sm font-medium text-slate-50 leading-relaxed">
+                        {q.question}
                       </p>
                     </div>
-                    <div className="space-y-1">
-                      <span className="inline-flex text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-emerald-300 bg-emerald-400/10 border border-emerald-400/40 rounded px-2 py-0.5">
-                        Model Answer
-                      </span>
-                      <p className="text-[0.84rem] text-slate-300 leading-relaxed">
-                        {q.answer}
-                      </p>
+                    <div className="px-4 pb-3 pt-2 border-t border-slate-800/80 space-y-3">
+                      <div className="space-y-1">
+                        <span className="inline-flex text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-indigo-300 bg-indigo-500/10 border border-indigo-400/40 rounded px-2 py-0.5">
+                          Intention
+                        </span>
+                        <p className="text-[0.84rem] text-slate-300 leading-relaxed">
+                          {q.intention}
+                        </p>
+                      </div>
+                      <div className="space-y-1">
+                        <span className="inline-flex text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-emerald-300 bg-emerald-400/10 border border-emerald-400/40 rounded px-2 py-0.5">
+                          Model Answer
+                        </span>
+                        <p className="text-[0.84rem] text-slate-300 leading-relaxed">
+                          {q.answer}
+                        </p>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
-          </div>
+          )}
 
-          {/* Road Map */}
-          <div>
-            <div className="flex items-baseline gap-2 mb-4 pb-3 border-b border-slate-800/70">
-              <h2 className="text-[1.05rem] font-semibold text-slate-50">
-                Preparation road map
-              </h2>
-              <span className="text-xs text-slate-300 bg-slate-900/70 px-2 py-0.5 rounded-2xl border border-slate-700/80">
-                {preparationPlan.length}-day plan
-              </span>
-            </div>
-            <div className="relative flex flex-col">
-              <div className="absolute left-7 top-0 bottom-0 w-0.5 bg-gradient-to-b from-indigo-400 via-sky-400 to-emerald-300 rounded" />
-              {preparationPlan.map((day) => (
-                <div
-                  key={day.day}
-                  className="relative pl-14 py-3 flex flex-col gap-2"
-                >
-                  <div className="absolute left-[1.1rem] top-4 w-3.5 h-3.5 rounded-full bg-slate-950 border-2 border-sky-400" />
-                  <div className="flex items-center gap-2">
-                    <span className="text-[0.7rem] font-semibold text-sky-300 bg-sky-400/10 border border-sky-400/40 rounded-2xl px-2 py-0.5">
-                      Day {day.day}
-                    </span>
-                    <h3 className="text-sm font-semibold text-slate-50">
-                      {day.focus}
-                    </h3>
+          {activeSection === "roadmap" && (
+            <div className="pr-1">
+              <div className="flex items-baseline gap-2 mb-4 pb-3 border-b border-slate-800/70">
+                <h2 className="text-[1.05rem] font-semibold text-slate-50">
+                  Preparation road map
+                </h2>
+                <span className="text-xs text-slate-300 bg-slate-900/70 px-2 py-0.5 rounded-2xl border border-slate-700/80">
+                  {preparationPlan.length}-day plan
+                </span>
+              </div>
+              <div className="relative flex flex-col">
+                <div className="absolute left-7 top-0 bottom-0 w-0.5 bg-gradient-to-b from-indigo-400 via-sky-400 to-emerald-300 rounded" />
+                {preparationPlan.map((day) => (
+                  <div
+                    key={day.day}
+                    className="relative pl-14 py-3 flex flex-col gap-2"
+                  >
+                    <div className="absolute left-[1.1rem] top-4 w-3.5 h-3.5 rounded-full bg-slate-950 border-2 border-sky-400" />
+                    <div className="flex items-center gap-2">
+                      <span className="text-[0.7rem] font-semibold text-sky-300 bg-sky-400/10 border border-sky-400/40 rounded-2xl px-2 py-0.5">
+                        Day {day.day}
+                      </span>
+                      <h3 className="text-sm font-semibold text-slate-50">
+                        {day.focus}
+                      </h3>
+                    </div>
+                    <ul className="m-0 p-0 flex flex-col gap-1 list-none">
+                      {day.tasks.map((task, i) => (
+                        <li
+                          key={i}
+                          className="flex items-start gap-2 text-[0.84rem] text-slate-300 leading-relaxed"
+                        >
+                          <span className="w-1 h-1 rounded-full bg-slate-500 mt-2" />
+                          {task}
+                        </li>
+                      ))}
+                    </ul>
                   </div>
-                  <ul className="m-0 p-0 flex flex-col gap-1 list-none">
-                    {day.tasks.map((task, i) => (
-                      <li
-                        key={i}
-                        className="flex items-start gap-2 text-[0.84rem] text-slate-300 leading-relaxed"
-                      >
-                        <span className="w-1 h-1 rounded-full bg-slate-500 mt-2" />
-                        {task}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
-          </div>
+          )}
         </section>
 
         {/* Right sidebar */}
@@ -356,6 +386,14 @@ const Interview = () => {
               ))}
             </div>
           </div>
+          {/* See all report option */}
+          <button
+            type="button"
+            onClick={() => navigate("/results")}
+            className="mt-auto w-full flex items-center justify-center gap-2.5 px-3 py-2.5 rounded-2xl text-sm text-slate-50 bg-slate-900/70 border border-slate-700/80 hover:bg-slate-800/80 transition-colors"
+          >
+            All generated reports
+          </button>
         </aside>
       </div>
     </main>

@@ -1,41 +1,37 @@
-import React, { useState } from "react"
-import { authRegister } from "../services/api.auth.js"
-import { useNavigate } from "react-router"
+import React, { useState } from "react";
+import { authRegister } from "../services/api.auth.js";
+import { useNavigate } from "react-router";
 
 const Register = () => {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
-    password: ""
-  })
-  const [loading, setLoading] = useState(false)
-  const navigate = useNavigate()
+    password: "",
+  });
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
-    })
-  }
+      [e.target.name]: e.target.value,
+    });
+  };
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
+    e.preventDefault();
 
     try {
-      setLoading(true)
-      await authRegister(
-        formData.name,
-        formData.email,
-        formData.password
-      )
-      navigate('/')
-      console.log("Registration successful")
+      setLoading(true);
+      await authRegister(formData.name, formData.email, formData.password);
+      navigate("/");
+      console.log("Registration successful");
     } catch (error) {
-      console.log(error.response?.data?.message || "Registration failed")
+      console.log(error.response?.data?.message || "Registration failed");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <main className="register-page w-full min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-slate-50 font-sans flex items-center justify-center px-4 py-10">
@@ -95,20 +91,32 @@ const Register = () => {
               />
             </div>
 
-            <div className="pt-2 flex justify-end">
-              <button
-                type="submit"
-                disabled={loading}
-                className="inline-flex items-center justify-center rounded-2xl bg-gradient-to-r from-indigo-500 via-sky-500 to-emerald-400 px-4 py-2.5 text-sm font-medium text-white shadow-lg shadow-indigo-500/40 hover:from-indigo-400 hover:via-sky-400 hover:to-emerald-300 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-2 focus:ring-offset-slate-950 disabled:opacity-60 disabled:cursor-not-allowed"
-              >
-                {loading ? "Creating account..." : "Create account"}
-              </button>
+            <div className="flex justify-end gap-4">
+              <div>
+                <button
+                  type="button"
+                  onClick={() => navigate("/login")}
+                  disabled={loading}
+                  className="inline-flex items-center justify-center rounded-2xl border border-slate-700 bg-slate-900/70 px-4 py-2.5 text-sm font-medium text-slate-100 hover:bg-slate-800/80 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-slate-950 disabled:opacity-60 disabled:cursor-not-allowed"
+                >
+                  Login
+                </button>
+              </div>
+              <div>
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="inline-flex items-center justify-center rounded-2xl bg-gradient-to-r from-indigo-500 via-sky-500 to-emerald-400 px-4 py-2.5 text-sm font-medium text-white shadow-lg shadow-indigo-500/40 hover:from-indigo-400 hover:via-sky-400 hover:to-emerald-300 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-2 focus:ring-offset-slate-950 disabled:opacity-60 disabled:cursor-not-allowed"
+                >
+                  {loading ? "Creating account..." : "Create account"}
+                </button>
+              </div>
             </div>
           </form>
         </div>
       </div>
     </main>
-  )
-}
+  );
+};
 
-export default Register
+export default Register;

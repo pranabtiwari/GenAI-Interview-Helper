@@ -1,202 +1,188 @@
-import { OpenRouter } from "@openrouter/sdk";
-import puppeteer from "puppeteer";
+import Groq from "groq-sdk";
+import puppeteer from "puppeteer-core";
 
-const openrouter = new OpenRouter({
-  apiKey: process.env.OPENROUTE_API_KEY,
-});
+const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+
+const INTERVIEW_REPORT_SCHEMA = {
+  type: "object",
+  properties: {
+    matchScore: {
+      type: "number",
+      description:
+        "A score between 0 and 100 indicating how well the candidate's profile matches the job description",
+    },
+    technicalQuestions: {
+      type: "array",
+      description: "Technical questions with intention and answers",
+      items: {
+        type: "object",
+        properties: {
+          question: {
+            type: "string",
+            description: "The technical question asked in the interview",
+          },
+          intention: {
+            type: "string",
+            description: "Why the interviewer asks this question",
+          },
+          answer: {
+            type: "string",
+            description: "How to answer this question",
+          },
+        },
+        required: ["question", "intention", "answer"],
+        additionalProperties: false,
+      },
+    },
+    behavioralQuestions: {
+      type: "array",
+      description: "Behavioral questions with intention and answers",
+      items: {
+        type: "object",
+        properties: {
+          question: {
+            type: "string",
+            description: "The behavioral question asked in the interview",
+          },
+          intention: {
+            type: "string",
+            description: "Why the interviewer asks this question",
+          },
+          answer: {
+            type: "string",
+            description: "How to answer this question",
+          },
+        },
+        required: ["question", "intention", "answer"],
+        additionalProperties: false,
+      },
+    },
+    skillGaps: {
+      type: "array",
+      description: "List of missing skills and their severity",
+      items: {
+        type: "object",
+        properties: {
+          skill: {
+            type: "string",
+            description: "Missing skill",
+          },
+          severity: {
+            type: "string",
+            enum: ["low", "medium", "high"],
+            description: "Importance of the skill gap",
+          },
+        },
+        required: ["skill", "severity"],
+        additionalProperties: false,
+      },
+    },
+    preparationPlan: {
+      type: "array",
+      description: "Day-wise preparation plan",
+      items: {
+        type: "object",
+        properties: {
+          day: {
+            type: "number",
+            description: "Day number starting from 1",
+          },
+          focus: {
+            type: "string",
+            description: "Main focus for the day",
+          },
+          tasks: {
+            type: "array",
+            items: {
+              type: "string",
+            },
+            description: "Tasks to complete",
+          },
+        },
+        required: ["day", "focus", "tasks"],
+        additionalProperties: false,
+      },
+    },
+    title: {
+      type: "string",
+      description: "Job title for which the interview report is generated",
+    },
+  },
+  required: [
+    "matchScore",
+    "technicalQuestions",
+    "behavioralQuestions",
+    "skillGaps",
+    "preparationPlan",
+    "title",
+  ],
+  additionalProperties: false,
+};
+
+function safeParseModelJSON(content) {
+  if (!content) {
+    return null;
+  }
+
+  if (typeof content === "object") {
+    return content;
+  }
+
+  const cleaned = String(content).replace(/```json|```/g, "").trim();
+
+  try {
+    return JSON.parse(cleaned);
+  } catch {
+    const match = cleaned.match(/\{[\s\S]*\}/);
+    if (!match) {
+      return null;
+    }
+    try {
+      return JSON.parse(match[0]);
+    } catch {
+      return null;
+    }
+  }
+}
 
 export async function generateInterviewReport({
   resume,
   selfDescription,
   jobDescription,
 }) {
-  const prompt = `Generate an interview report for a candidate with the following details:
-                        Resume: ${resume}
-                        Self Description: ${selfDescription}
-                        Job Description: ${jobDescription}
-`;
+  const prompt = `Generate an interview report for a candidate.
 
-  const response = await openrouter.chat.send({
-    chatGenerationParams: {
-      model: "nvidia/nemotron-3-super-120b-a12b:free",
-      messages: [
-        {
-          role: "user",
-          content: prompt,
-        },
-      ],
-      responseFormat: {
-        type: "json_schema",
-        jsonSchema: {
-          name: "interview_report",
-          strict: true,
-          schema: {
-            type: "object",
-            properties: {
-              matchScore: {
-                type: "number",
-                description:
-                  "A score between 0 and 100 indicating how well the candidate's profile matches the job description",
-              },
+Candidate details:
+- Resume: ${resume}
+- Self Description: ${selfDescription}
+- Job Description: ${jobDescription}
 
-              technicalQuestions: {
-                type: "array",
-                description: "Technical questions with intention and answers",
-                items: {
-                  type: "object",
-                  properties: {
-                    question: {
-                      type: "string",
-                      description:
-                        "The technical question asked in the interview",
-                    },
-                    intention: {
-                      type: "string",
-                      description: "Why the interviewer asks this question",
-                    },
-                    answer: {
-                      type: "string",
-                      description: "How to answer this question",
-                    },
-                  },
-                  required: ["question", "intention", "answer"],
-                  additionalProperties: false,
-                },
-              },
+Return valid JSON only that follows this schema exactly:
+${JSON.stringify(INTERVIEW_REPORT_SCHEMA)}`;
 
-              behavioralQuestions: {
-                type: "array",
-                description: "Behavioral questions with intention and answers",
-                items: {
-                  type: "object",
-                  properties: {
-                    question: {
-                      type: "string",
-                      description:
-                        "The behavioral question asked in the interview",
-                    },
-                    intention: {
-                      type: "string",
-                      description: "Why the interviewer asks this question",
-                    },
-                    answer: {
-                      type: "string",
-                      description: "How to answer this question",
-                    },
-                  },
-                  required: ["question", "intention", "answer"],
-                  additionalProperties: false,
-                },
-              },
-
-              skillGaps: {
-                type: "array",
-                description: "List of missing skills and their severity",
-                items: {
-                  type: "object",
-                  properties: {
-                    skill: {
-                      type: "string",
-                      description: "Missing skill",
-                    },
-                    severity: {
-                      type: "string",
-                      enum: ["low", "medium", "high"],
-                      description: "Importance of the skill gap",
-                    },
-                  },
-                  required: ["skill", "severity"],
-                  additionalProperties: false,
-                },
-              },
-
-              preparationPlan: {
-                type: "array",
-                description: "Day-wise preparation plan",
-                items: {
-                  type: "object",
-                  properties: {
-                    day: {
-                      type: "number",
-                      description: "Day number starting from 1",
-                    },
-                    focus: {
-                      type: "string",
-                      description: "Main focus for the day",
-                    },
-                    tasks: {
-                      type: "array",
-                      items: {
-                        type: "string",
-                      },
-                      description: "Tasks to complete",
-                    },
-                  },
-                  required: ["day", "focus", "tasks"],
-                  additionalProperties: false,
-                },
-              },
-
-              title: {
-                type: "string",
-                description:
-                  "Job title for which the interview report is generated",
-              },
-            },
-
-            required: [
-              "matchScore",
-              "technicalQuestions",
-              "behavioralQuestions",
-              "skillGaps",
-              "preparationPlan",
-              "title",
-            ],
-
-            additionalProperties: false,
-          },
-        },
+  const completion = await groq.chat.completions.create({
+    model: process.env.GROQ_REPORT_MODEL || "llama-3.3-70b-versatile",
+    response_format: { type: "json_object" },
+    temperature: 0.3,
+    messages: [
+      {
+        role: "system",
+        content:
+          "You generate strict JSON interview reports. Do not include markdown or explanation.",
       },
-    },
+      {
+        role: "user",
+        content: prompt,
+      },
+    ],
   });
 
-  const content = response.choices[0].message.content;
-
-  // Normalize to a raw string we expect to be JSON
-  let raw = "";
-  if (Array.isArray(content)) {
-    raw = content[0]?.text ?? "";
-  } else if (typeof content === "string") {
-    raw = content;
-  } else if (content && typeof content === "object") {
-    // Already structured
-    if (typeof content.html === "string") {
-      parsedContent = content;
-    } else {
-      raw = JSON.stringify(content);
-    }
-  }
-
-  let parsedContent = parsedContent; // may already be set above
+  const parsedContent = safeParseModelJSON(
+    completion.choices?.[0]?.message?.content,
+  );
 
   if (!parsedContent) {
-    try {
-      // First attempt: parse whole string
-      parsedContent = JSON.parse(raw);
-    } catch {
-      // Fallback: try to extract JSON substring between first { and last }
-      const start = raw.indexOf("{");
-      const end = raw.lastIndexOf("}");
-      if (start !== -1 && end > start) {
-        const jsonSlice = raw.slice(start, end + 1);
-        parsedContent = JSON.parse(jsonSlice);
-      } else {
-        console.error("OpenRouter resume_html non-JSON response:", raw);
-        throw new Error(
-          "Model did not return valid JSON for resume_html. Please try again."
-        );
-      }
-    }
+    throw new Error("Invalid response format for interview report.");
   }
 
   // Map AI fields → schema fields
@@ -213,20 +199,36 @@ export async function generateInterviewReport({
   return mapped;
 }
 
+async function launchBrowser() {
+  return await puppeteer.launch({
+    executablePath: process.env.CHROME_PATH || "/usr/bin/chromium",
+    headless: "new",
+    args: [
+      "--no-sandbox",
+      "--disable-setuid-sandbox",
+      "--disable-dev-shm-usage",
+      "--disable-gpu",
+    ],
+  });
+}
+
 async function generatePDFFromHTML(htmlContent) {
   let browser;
 
   try {
-    browser = await puppeteer.launch({
-      headless: true,
-      args: ["--no-sandbox", "--disable-setuid-sandbox"],
+    browser = await launchBrowser();
+    const page = await browser.newPage();
+
+    await page.setContent(htmlContent, {
+      waitUntil: "networkidle0",
+      timeout: 30000,
     });
 
-    const page = await browser.newPage();
-    await page.setContent(htmlContent, { waitUntil: "networkidle0" });
+    await page.emulateMediaType("screen");
 
-    const pdfBuffer = await page.pdf({
+    return await page.pdf({
       format: "A4",
+      printBackground: true,
       margin: {
         top: "20mm",
         bottom: "20mm",
@@ -234,12 +236,39 @@ async function generatePDFFromHTML(htmlContent) {
         right: "15mm",
       },
     });
-
-    return pdfBuffer;
   } finally {
-    if (browser) {
-      await browser.close();
+    if (browser) await browser.close();
+  }
+}
+
+async function generateHTMLFromAI(prompt) {
+  try {
+    const completion = await groq.chat.completions.create({
+      model: "openai/gpt-oss-20b",
+      messages: [
+        {
+          role: "user",
+          content:
+            prompt +
+            "\n\nReturn ONLY clean HTML. No markdown. No explanation.",
+        },
+      ],
+      temperature: 0.7,
+    });
+
+    let html = completion.choices?.[0]?.message?.content;
+
+    if (!html) {
+      throw new Error("No HTML returned");
     }
+
+    // remove ```html ``` if model adds it
+    html = html.replace(/```html|```/g, "").trim();
+
+    return html;
+  } catch (err) {
+    console.error("GROQ ERROR:", err);
+    throw new Error("AI failed");
   }
 }
 
@@ -248,65 +277,23 @@ export async function generateInterviewReportPDF({
   selfDescription,
   jobDescription,
 }) {
-  const prompt = `Generate a resume for a candidate with the following details:
-                          Resume: ${resume}
-                          Self Description: ${selfDescription}
-                          Job Description: ${jobDescription}
+  const prompt = `
+Create a professional resume using:
 
-                          The response must be a JSON object with a single field "html" which contains the full HTML content of the resume. The resume should be tailored for the given job description and should highlight the candidate's strengths and relevant experience. The HTML content should be well-formatted and structured, making it easy to read and visually appealing.
-                          The content of the resume should not sound like it's generated by AI and should be as close as possible to a real human-written resume.
-                          You can highlight the content using some colors or different font styles but the overall design should be simple and professional.`;
+Resume: ${resume}
+Self Description: ${selfDescription}
+Job Description: ${jobDescription}
 
-  const response = await openrouter.chat.send({
-    chatGenerationParams: {
-      model: "nvidia/nemotron-3-super-120b-a12b:free",
-      messages: [
-        {
-          role: "user",
-          content: prompt,
-        },
-      ],
-      responseFormat: {
-        type: "json_schema",
-        jsonSchema: {
-          name: "resume_html",
-          strict: true,
-          schema: {
-            type: "object",
-            properties: {
-              html: {
-                type: "string",
-                description: "The HTML content of the generated resume",
-              },
-            },
-            required: ["html"],
-            additionalProperties: false,
-          },
-        },
-      },
-    },
-  });
+- Clean layout
+- Sections: Summary, Skills, Experience, Education
+- Minimal styling
+`;
 
-  const content = response.choices[0].message.content;
-
-  // Handle both "array of parts" and "string/object" cases
-  let parsedContent;
-  if (Array.isArray(content)) {
-    const jsonText = content[0]?.text ?? "";
-    parsedContent = jsonText ? JSON.parse(jsonText) : null;
-  } else if (typeof content === "string") {
-    parsedContent = JSON.parse(content);
-  } else {
-    parsedContent = content;
+  try {
+    const html = await generateHTMLFromAI(prompt);
+    return await generatePDFFromHTML(html);
+  } catch (err) {
+    console.error("FINAL ERROR:", err);
+    throw err;
   }
-
-  if (!parsedContent || typeof parsedContent.html !== "string") {
-    throw new Error(
-      "Invalid response format: expected a JSON object with a string 'html' field.",
-    );
-  }
-
-  // Convert HTML to PDF buffer
-  const pdfBuffer = await generatePDFFromHTML(parsedContent.html);
-  return pdfBuffer;
 }
