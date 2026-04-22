@@ -1,5 +1,5 @@
 import Groq from "groq-sdk";
-import puppeteer from "puppeteer-core";
+import puppeteer from "puppeteer";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -203,8 +203,7 @@ ${JSON.stringify(INTERVIEW_REPORT_SCHEMA)}`;
 }
 
 async function launchBrowser() {
-  return await puppeteer.launch({
-    executablePath: process.env.CHROME_PATH || "/usr/bin/chromium",
+  const launchOptions = {
     headless: "new",
     args: [
       "--no-sandbox",
@@ -212,7 +211,13 @@ async function launchBrowser() {
       "--disable-dev-shm-usage",
       "--disable-gpu",
     ],
-  });
+  };
+
+  if (process.env.CHROME_PATH) {
+    launchOptions.executablePath = process.env.CHROME_PATH;
+  }
+
+  return await puppeteer.launch(launchOptions);
 }
 
 async function generatePDFFromHTML(htmlContent) {
