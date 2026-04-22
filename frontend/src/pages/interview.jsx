@@ -1,7 +1,10 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router";
 import { useNavigate } from "react-router";
-import { getInterviewReportById, generateInterviewReportPDF } from "../services/api.interview.js";
+import {
+  getInterviewReportById,
+  generateInterviewReportPDF,
+} from "../services/api.interview.js";
 
 const severityClass = (severity) => {
   const value = (severity || "").toString().toLowerCase();
@@ -78,15 +81,17 @@ const Interview = () => {
 
   if (loading) {
     return (
-      <main className="w-full min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-slate-50 flex items-center justify-center">
-        <h1 className="text-base font-medium text-slate-200">Loading your interview plan...</h1>
+      <main className="w-full min-h-screen bg-linear-to-br from-slate-950 via-slate-900 to-slate-950 text-slate-50 flex items-center justify-center">
+        <h1 className="text-base font-medium text-slate-200">
+          Loading your interview plan...
+        </h1>
       </main>
     );
   }
 
   if (error || !report) {
     return (
-      <main className="w-full min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-slate-50 flex items-center justify-center">
+      <main className="w-full min-h-screen bg-linear-to-br from-slate-950 via-slate-900 to-slate-950 text-slate-50 flex items-center justify-center">
         <p className="rounded-2xl border border-red-500/40 bg-red-500/10 px-4 py-2 text-sm text-red-100">
           {error || "No interview report found."}
         </p>
@@ -101,103 +106,108 @@ const Interview = () => {
   const ringClass = scoreRingClass(report.matchScore || 0);
 
   return (
-    <main className="w-full min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-slate-50 font-sans flex items-stretch justify-center px-4 py-4">
-      <div className="relative flex w-full max-w-6xl h-[calc(100vh-2rem)] mx-auto rounded-3xl border border-white/10 bg-white/5 shadow-[0_18px_60px_rgba(15,23,42,0.75)] backdrop-blur-xl overflow-hidden">
-        <div className="pointer-events-none absolute inset-0 opacity-40 mix-blend-screen bg-[radial-gradient(circle_at_top,_#4f46e5_0,_transparent_45%),_radial-gradient(circle_at_bottom,_#22c55e_0,_transparent_45%)]" />
+    <main className="w-full min-h-screen bg-linear-to-br from-slate-950 via-slate-900 to-slate-950 text-slate-50 font-sans flex items-center justify-center px-3 py-3 sm:px-4 sm:py-4">
+      <div className="relative flex w-full max-w-7xl min-h-[calc(100vh-1.5rem)] flex-col overflow-hidden rounded-4xl border border-white/10 bg-white/5 shadow-[0_18px_60px_rgba(15,23,42,0.75)] backdrop-blur-xl md:h-[calc(100vh-2rem)] md:flex-row">
+        <div className="pointer-events-none absolute inset-0 opacity-40 mix-blend-screen bg-[radial-gradient(circle_at_top,#4f46e5_0,transparent_45%),radial-gradient(circle_at_bottom,#22c55e_0,transparent_45%)]" />
 
         {/* Left nav */}
-        <nav className="relative w-56 flex-shrink-0 p-7 flex flex-col justify-between gap-1 border-r border-slate-800/70 bg-slate-950/60">
+        <nav className="relative flex w-full shrink-0 flex-col justify-between gap-4 border-b border-slate-800/70 bg-slate-950/60 p-4 md:w-56 md:border-b-0 md:border-r md:p-7">
           <div>
-            <p className="text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-slate-500 mb-3 px-3">
+            <p className="mb-3 px-1 text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-slate-500 md:px-3">
               Sections
             </p>
 
-            <button
-              type="button"
-              onClick={() => setActiveSection("technical")}
-              className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-2xl text-sm border transition-colors ${
-                activeSection === "technical"
-                  ? "text-slate-50 bg-slate-900/70 border-slate-700/80"
-                  : "text-slate-400 hover:bg-slate-900/70 hover:text-slate-50 border-transparent hover:border-slate-700/80"
-              }`}
-            >
-              <span className="flex items-center">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <polyline points="16 18 22 12 16 6" />
-                  <polyline points="8 6 2 12 8 18" />
-                </svg>
-              </span>
-              Technical questions
-            </button>
+            <div className="grid grid-cols-3 gap-1.5 md:flex md:flex-col md:gap-1.5">
+              <button
+                type="button"
+                onClick={() => setActiveSection("technical")}
+                className={`flex min-w-0 flex-col items-center justify-center gap-1 rounded-2xl border px-2 py-2 text-center text-[0.62rem] font-medium leading-tight transition-colors sm:flex-row sm:justify-start sm:gap-2.5 sm:px-3 sm:py-2.5 sm:text-sm sm:text-left md:justify-start ${
+                  activeSection === "technical"
+                    ? "border-slate-700/80 bg-slate-900/70 text-slate-50"
+                    : "border-transparent text-slate-400 hover:border-slate-700/80 hover:bg-slate-900/70 hover:text-slate-50"
+                }`}
+              >
+                <span className="flex items-center shrink-0">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <polyline points="16 18 22 12 16 6" />
+                    <polyline points="8 6 2 12 8 18" />
+                  </svg>
+                </span>
+                <span className="sm:hidden">Tech</span>
+                <span className="hidden sm:inline">Technical questions</span>
+              </button>
 
-            <button
-              type="button"
-              onClick={() => setActiveSection("behavioral")}
-              className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-2xl text-sm mt-1.5 transition-colors border ${
-                activeSection === "behavioral"
-                  ? "text-slate-50 bg-slate-900/70 border-slate-700/80"
-                  : "text-slate-400 hover:bg-slate-900/70 hover:text-slate-50 border-transparent hover:border-slate-700/80"
-              }`}
-            >
-              <span className="flex items-center">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-                </svg>
-              </span>
-              Behavioral questions
-            </button>
+              <button
+                type="button"
+                onClick={() => setActiveSection("behavioral")}
+                className={`flex min-w-0 flex-col items-center justify-center gap-1 rounded-2xl border px-2 py-2 text-center text-[0.62rem] font-medium leading-tight transition-colors sm:flex-row sm:justify-start sm:gap-2.5 sm:px-3 sm:py-2.5 sm:text-sm sm:text-left md:justify-start ${
+                  activeSection === "behavioral"
+                    ? "border-slate-700/80 bg-slate-900/70 text-slate-50"
+                    : "border-transparent text-slate-400 hover:border-slate-700/80 hover:bg-slate-900/70 hover:text-slate-50"
+                }`}
+              >
+                <span className="flex items-center shrink-0">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                  </svg>
+                </span>
+                <span className="sm:hidden">Behavior</span>
+                <span className="hidden sm:inline">Behavioral questions</span>
+              </button>
 
-            <button
-              type="button"
-              onClick={() => setActiveSection("roadmap")}
-              className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-2xl text-sm mt-1.5 transition-colors border ${
-                activeSection === "roadmap"
-                  ? "text-slate-50 bg-slate-900/70 border-slate-700/80"
-                  : "text-slate-400 hover:bg-slate-900/70 hover:text-slate-50 border-transparent hover:border-slate-700/80"
-              }`}
-            >
-              <span className="flex items-center">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <polygon points="3 11 22 2 13 21 11 13 3 11" />
-                </svg>
-              </span>
-              Road map
-            </button>
+              <button
+                type="button"
+                onClick={() => setActiveSection("roadmap")}
+                className={`flex min-w-0 flex-col items-center justify-center gap-1 rounded-2xl border px-2 py-2 text-center text-[0.62rem] font-medium leading-tight transition-colors sm:flex-row sm:justify-start sm:gap-2.5 sm:px-3 sm:py-2.5 sm:text-sm sm:text-left md:justify-start ${
+                  activeSection === "roadmap"
+                    ? "border-slate-700/80 bg-slate-900/70 text-slate-50"
+                    : "border-transparent text-slate-400 hover:border-slate-700/80 hover:bg-slate-900/70 hover:text-slate-50"
+                }`}
+              >
+                <span className="flex items-center shrink-0">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <polygon points="3 11 22 2 13 21 11 13 3 11" />
+                  </svg>
+                </span>
+                <span className="sm:hidden">Roadmap</span>
+                <span className="hidden sm:inline">Road map</span>
+              </button>
+            </div>
           </div>
 
           <button
             onClick={handleDownloadPDF}
-            className="inline-flex items-center justify-center rounded-2xl bg-gradient-to-r from-indigo-500 via-sky-500 to-emerald-400 px-3 py-2 text-[0.7rem] font-semibold text-white shadow-lg shadow-indigo-500/40 hover:from-indigo-400 hover:via-sky-400 hover:to-emerald-300 transition-colors"
+            className="inline-flex items-center justify-center rounded-2xl bg-linear-to-r from-indigo-500 via-sky-500 to-emerald-400 px-3 py-2 text-[0.7rem] font-semibold text-white shadow-lg shadow-indigo-500/40 transition-colors hover:from-indigo-400 hover:via-sky-400 hover:to-emerald-300"
             disabled={downloading}
           >
             {downloading ? "Preparing PDF..." : "Download PDF"}
@@ -205,7 +215,7 @@ const Interview = () => {
         </nav>
 
         {/* Center content */}
-        <section className="relative flex-1 px-8 py-7 bg-slate-950/50 border-r border-slate-800/70 overflow-y-auto">
+        <section className="relative flex-1 overflow-y-auto border-b border-r-0 border-slate-800/70 bg-slate-950/50 px-4 py-5 md:border-r md:px-8 md:py-7">
           {activeSection === "technical" && (
             <div className="pr-1">
               <div className="flex items-baseline gap-2 mb-4 pb-3 border-b border-slate-800/70">
@@ -313,7 +323,7 @@ const Interview = () => {
                 </span>
               </div>
               <div className="relative flex flex-col">
-                <div className="absolute left-7 top-0 bottom-0 w-0.5 bg-gradient-to-b from-indigo-400 via-sky-400 to-emerald-300 rounded" />
+                <div className="absolute left-7 top-0 bottom-0 w-0.5 rounded bg-linear-to-b from-indigo-400 via-sky-400 to-emerald-300" />
                 {preparationPlan.map((day) => (
                   <div
                     key={day.day}
@@ -347,7 +357,7 @@ const Interview = () => {
         </section>
 
         {/* Right sidebar */}
-        <aside className="relative w-60 flex-shrink-0 p-7 flex flex-col gap-5 bg-slate-950/60">
+        <aside className="relative flex w-full shrink-0 flex-col gap-5 border-t border-slate-800/70 bg-slate-950/60 p-4 md:w-60 md:border-t-0 md:p-7">
           {/* Match Score */}
           <div className="flex flex-col items-center gap-2.5">
             <p className="self-start text-[0.75rem] font-semibold uppercase tracking-[0.18em] text-slate-500">
@@ -378,7 +388,7 @@ const Interview = () => {
                 <span
                   key={i}
                   className={`text-xs font-medium px-2.5 py-1 rounded-md border backdrop-blur-sm ${severityClass(
-                    gap.severity
+                    gap.severity,
                   )}`}
                 >
                   {gap.skill}

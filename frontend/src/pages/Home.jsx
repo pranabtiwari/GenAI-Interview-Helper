@@ -1,5 +1,5 @@
-import { generateInterviewReport, getAllInterviewReports, getInterviewReportById } from '../services/api.interview.js';
-import { useState, useRef } from 'react';
+import { generateInterviewReport } from "../services/api.interview.js";
+import { useState, useRef } from "react";
 import { useNavigate } from 'react-router';
 
 export default function Home() {
@@ -8,9 +8,9 @@ export default function Home() {
     jobDescription: ""
   });
   const resumeInputRef = useRef(null);
+  const [resumeName, setResumeName] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [interviewReport, setInterviewReport] = useState(null);
   const navigate = useNavigate();
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -34,7 +34,6 @@ export default function Home() {
     try{
       setLoading(true);
       const response = await generateInterviewReport({ ...formData, resume: resumeFile });
-      setInterviewReport(response.data.interviewReport);
       navigate(`/interview/${response.data.interviewReport._id}`);
 
     } catch (err) {
@@ -45,12 +44,14 @@ export default function Home() {
   }
 
   return (
-    <main className="home-page w-full min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-slate-50 font-sans flex items-center justify-center px-4 py-10">
-      <div className="relative w-full max-w-4xl overflow-hidden rounded-3xl border border-white/10 bg-white/5 shadow-[0_18px_60px_rgba(15,23,42,0.75)] backdrop-blur-xl">
-        <div className="pointer-events-none absolute inset-0 opacity-40 mix-blend-screen bg-[radial-gradient(circle_at_top,_#4f46e5_0,_transparent_40%),_radial-gradient(circle_at_bottom,_#22c55e_0,_transparent_45%)]" />
+    <main className="home-page flex min-h-screen w-full items-center justify-center bg-linear-to-br from-slate-950 via-slate-900 to-slate-950 px-4 py-6 text-slate-50 sm:px-6 sm:py-10">
+      <div className="relative w-full max-w-6xl overflow-hidden rounded-4xl border border-white/10 bg-white/5 shadow-[0_18px_60px_rgba(15,23,42,0.75)] backdrop-blur-xl">
+        <div className="pointer-events-none absolute inset-0 opacity-40 mix-blend-screen bg-[radial-gradient(circle_at_top,#4f46e5_0,transparent_40%),radial-gradient(circle_at_bottom,#22c55e_0,transparent_45%)]" />
+        <div className="pointer-events-none absolute -right-24 -top-20 h-40 w-40 rounded-full bg-sky-400/20 blur-3xl" />
+        <div className="pointer-events-none absolute -bottom-20 -left-16 h-44 w-44 rounded-full bg-emerald-400/15 blur-3xl" />
 
-        <div className="relative grid gap-8 p-8 md:grid-cols-[1.3fr_1fr] md:p-10">
-          <section className="space-y-6">
+        <div className="relative grid gap-6 p-5 sm:p-6 md:grid-cols-[1.25fr_0.95fr] md:gap-8 md:p-8 lg:p-10">
+          <section className="space-y-5 md:space-y-6">
             {error && (
               <div
                 className="w-full rounded-2xl border border-red-500/40 bg-red-500/10 px-4 py-3 text-sm text-red-100"
@@ -65,18 +66,23 @@ export default function Home() {
                 <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
                 AI Interview Copilot
               </p>
-              <h1 className="text-3xl font-semibold tracking-tight text-slate-50 md:text-4xl">
+              <h1 className="max-w-xl text-3xl font-semibold tracking-tight text-slate-50 sm:text-4xl lg:text-5xl">
                 Turn your resume into a tailored interview plan.
               </h1>
-              <p className="text-sm leading-relaxed text-slate-300">
+              <p className="max-w-2xl text-sm leading-relaxed text-slate-300 sm:text-base">
                 Drop your resume, describe yourself and the role, and we’ll craft
                 focused questions and a preparation roadmap so you walk into the
                 interview ready.
               </p>
+              <div className="flex flex-wrap gap-2 text-[0.7rem] font-medium uppercase tracking-[0.18em] text-slate-300">
+                <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1">Fast setup</span>
+                <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1">Mobile friendly</span>
+                <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1">Role matched</span>
+              </div>
             </header>
 
-            <div className="space-y-4 rounded-2xl bg-slate-900/50 p-4 border border-slate-700/60">
-              <div className="space-y-1">
+            <div className="space-y-4 rounded-3xl border border-slate-700/60 bg-slate-900/50 p-4 shadow-inner shadow-black/20 sm:p-5">
+              <div className="space-y-1.5">
                 <label
                   htmlFor="selfDescription"
                   className="block text-xs font-medium uppercase tracking-[0.16em] text-slate-400"
@@ -87,13 +93,13 @@ export default function Home() {
                   id="selfDescription"
                   name="selfDescription"
                   placeholder="Share your background, experience level, and what you're aiming for."
-                  className="w-full min-h-[96px] rounded-xl border border-slate-700 bg-slate-900/70 px-3 py-2.5 text-sm text-slate-100 placeholder:text-slate-500 focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/60"
+                  className="w-full min-h-27.5 rounded-2xl border border-slate-700 bg-slate-900/70 px-3 py-3 text-sm text-slate-100 placeholder:text-slate-500 focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/60 sm:min-h-32"
                   value={formData.selfDescription}
                   onChange={handleInputChange}
                 />
               </div>
 
-              <div className="space-y-1">
+              <div className="space-y-1.5">
                 <label
                   htmlFor="jobDescription"
                   className="block text-xs font-medium uppercase tracking-[0.16em] text-slate-400"
@@ -104,7 +110,7 @@ export default function Home() {
                   id="jobDescription"
                   name="jobDescription"
                   placeholder="Paste the job description or key responsibilities."
-                  className="w-full min-h-[96px] rounded-xl border border-slate-700 bg-slate-900/70 px-3 py-2.5 text-sm text-slate-100 placeholder:text-slate-500 focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/60"
+                  className="w-full min-h-27.5 rounded-2xl border border-slate-700 bg-slate-900/70 px-3 py-3 text-sm text-slate-100 placeholder:text-slate-500 focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/60 sm:min-h-32"
                   value={formData.jobDescription}
                   onChange={handleInputChange}
                 />
@@ -112,16 +118,16 @@ export default function Home() {
             </div>
           </section>
 
-          <aside className="space-y-6 rounded-2xl bg-slate-950/70 p-4 border border-slate-800/80">
+          <aside className="space-y-5 rounded-3xl border border-slate-800/80 bg-slate-950/70 p-4 shadow-[0_12px_30px_rgba(15,23,42,0.35)] sm:p-5 md:sticky md:top-24 md:self-start">
             <div className="space-y-2">
               <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">
                 Resume upload
               </p>
               <label
                 htmlFor="resume"
-                className="group flex cursor-pointer flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-slate-700 bg-slate-900/60 px-4 py-6 text-center hover:border-indigo-400/70 hover:bg-slate-900/90 transition-colors"
+                className="group flex cursor-pointer flex-col items-center justify-center gap-2 rounded-3xl border border-dashed border-slate-700 bg-slate-900/60 px-4 py-6 text-center transition-colors hover:border-indigo-400/70 hover:bg-slate-900/90"
               >
-                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-indigo-500/20 text-indigo-300 group-hover:bg-indigo-500/30">
+                <div className="flex h-11 w-11 items-center justify-center rounded-full bg-indigo-500/20 text-indigo-300 transition-colors group-hover:bg-indigo-500/30">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 24 24"
@@ -143,6 +149,11 @@ export default function Home() {
                   <p className="text-[0.7rem] text-slate-400">
                     Max 5MB. We only use it to craft your interview prep.
                   </p>
+                  {resumeName && (
+                    <p className="text-[0.7rem] font-medium text-emerald-300">
+                      Selected: {resumeName}
+                    </p>
+                  )}
                 </div>
                 <input
                   type="file"
@@ -151,34 +162,38 @@ export default function Home() {
                   accept=".pdf"
                   className="hidden"
                   ref={resumeInputRef}
+                  onChange={(event) => {
+                    const selectedFile = event.target.files?.[0];
+                    setResumeName(selectedFile ? selectedFile.name : "");
+                  }}
                 />
               </label>
             </div>
 
-            <div className="space-y-3 text-xs text-slate-400">
+            <div className="space-y-3 rounded-2xl border border-slate-800/70 bg-slate-900/40 p-4 text-xs text-slate-400">
               <p className="font-semibold tracking-[0.14em] uppercase text-slate-500">
                 What you'll get
               </p>
-              <ul className="space-y-1.5">
-                <li className="flex items-center gap-2">
+              <ul className="space-y-2">
+                <li className="flex items-start gap-2">
                   <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
-                  Role-specific technical and behavioral questions
+                  <span>Role-specific technical and behavioral questions</span>
                 </li>
-                <li className="flex items-center gap-2">
+                <li className="flex items-start gap-2">
                   <span className="h-1.5 w-1.5 rounded-full bg-indigo-400" />
-                  A day‑by‑day preparation roadmap
+                  <span>A day-by-day preparation roadmap</span>
                 </li>
-                <li className="flex items-center gap-2">
+                <li className="flex items-start gap-2">
                   <span className="h-1.5 w-1.5 rounded-full bg-sky-400" />
-                  Highlighted skill gaps to focus on
+                  <span>Highlighted skill gaps to focus on</span>
                 </li>
               </ul>
             </div>
 
-            <div className="pt-2">
+            <div className="pt-1">
               <button
                 type="button"
-                className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-indigo-500 via-sky-500 to-emerald-400 px-4 py-2.5 text-sm font-medium text-white shadow-lg shadow-indigo-500/40 hover:from-indigo-400 hover:via-sky-400 hover:to-emerald-300 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-2 focus:ring-offset-slate-950 disabled:opacity-60 disabled:cursor-not-allowed"
+                className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-linear-to-r from-indigo-500 via-sky-500 to-emerald-400 px-4 py-3 text-sm font-medium text-white shadow-lg shadow-indigo-500/40 transition hover:from-indigo-400 hover:via-sky-400 hover:to-emerald-300 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-2 focus:ring-offset-slate-950 disabled:cursor-not-allowed disabled:opacity-60"
                 disabled={loading}
                 onClick={handleReportGeneration}
               >
@@ -186,12 +201,12 @@ export default function Home() {
               </button>
               <button
                 type="button"
-                className="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-slate-700 bg-slate-950/70 px-4 py-2 text-xs font-medium text-slate-100 hover:bg-slate-900/80"
-                onClick={() => navigate('/results')}
+                className="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-slate-700 bg-slate-950/70 px-4 py-2.5 text-xs font-medium text-slate-100 transition hover:bg-slate-900/80"
+                onClick={() => navigate("/results")}
               >
                 View all previous reports
               </button>
-              <p className="mt-2 text-[0.7rem] text-slate-500 text-center">
+              <p className="mt-3 text-center text-[0.7rem] text-slate-500">
                 We don’t store your resume after generating the report.
               </p>
             </div>

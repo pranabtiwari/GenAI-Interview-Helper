@@ -35,7 +35,7 @@ const Allresult = () => {
 
   if (loading) {
     return (
-      <main className="w-full min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-slate-50 flex items-center justify-center">
+      <main className="w-full min-h-screen bg-linear-to-br from-slate-950 via-slate-900 to-slate-950 text-slate-50 flex items-center justify-center">
         <h1 className="text-base font-medium text-slate-200">Loading your past interview plans...</h1>
       </main>
     );
@@ -43,7 +43,7 @@ const Allresult = () => {
 
   if (error) {
     return (
-      <main className="w-full min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-slate-50 flex items-center justify-center px-4">
+      <main className="w-full min-h-screen bg-linear-to-br from-slate-950 via-slate-900 to-slate-950 text-slate-50 flex items-center justify-center px-4">
         <div className="max-w-md w-full rounded-2xl border border-red-500/40 bg-red-500/10 px-4 py-3 text-sm text-red-100">
           <p className="font-semibold mb-1">Error</p>
           <p>{error}</p>
@@ -53,18 +53,18 @@ const Allresult = () => {
   }
 
   return (
-    <main className="w-full min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-slate-50 font-sans flex items-center justify-center px-4 py-10">
-      <div className="relative w-full max-w-5xl mx-auto rounded-3xl border border-white/10 bg-white/5 shadow-[0_18px_60px_rgba(15,23,42,0.75)] backdrop-blur-xl overflow-hidden">
-        <div className="pointer-events-none absolute inset-0 opacity-40 mix-blend-screen bg-[radial-gradient(circle_at_top,_#4f46e5_0,_transparent_45%),_radial-gradient(circle_at_bottom,_#22c55e_0,_transparent_45%)]" />
+    <main className="w-full min-h-screen bg-linear-to-br from-slate-950 via-slate-900 to-slate-950 text-slate-50 font-sans flex items-center justify-center px-4 py-6 sm:py-10">
+      <div className="relative w-full max-w-6xl mx-auto rounded-4xl border border-white/10 bg-white/5 shadow-[0_18px_60px_rgba(15,23,42,0.75)] backdrop-blur-xl overflow-hidden">
+        <div className="pointer-events-none absolute inset-0 opacity-40 mix-blend-screen bg-[radial-gradient(circle_at_top,#4f46e5_0,transparent_45%),radial-gradient(circle_at_bottom,#22c55e_0,transparent_45%)]" />
 
-        <div className="relative p-6 md:p-8 space-y-6">
-          <header className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div className="relative p-5 sm:p-6 md:p-8 space-y-6">
+          <header className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div className="space-y-1">
               <p className="inline-flex items-center gap-2 rounded-full border border-emerald-400/30 bg-emerald-400/5 px-3 py-1 text-[0.7rem] font-semibold uppercase tracking-[0.2em] text-emerald-300">
                 <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
                 Saved interview plans
               </p>
-              <h1 className="text-2xl md:text-3xl font-semibold tracking-tight text-slate-50">
+              <h1 className="text-2xl font-semibold tracking-tight text-slate-50 md:text-3xl">
                 Your generated interview results
               </h1>
               <p className="text-sm text-slate-300">
@@ -75,7 +75,7 @@ const Allresult = () => {
             <button
               type="button"
               onClick={() => navigate("/")}
-              className="inline-flex items-center justify-center rounded-2xl border border-slate-700/70 bg-slate-900/70 px-3 py-2 text-xs font-medium text-slate-100 hover:bg-slate-800/80"
+              className="inline-flex items-center justify-center rounded-2xl border border-slate-700/70 bg-slate-900/70 px-3 py-2 text-xs font-medium text-slate-100 transition hover:bg-slate-800/80"
             >
               New interview plan
             </button>
@@ -87,7 +87,7 @@ const Allresult = () => {
               <button
                 type="button"
                 onClick={() => navigate("/")}
-                className="mt-1 inline-flex items-center justify-center rounded-2xl bg-gradient-to-r from-indigo-500 via-sky-500 to-emerald-400 px-4 py-2 text-xs font-medium text-white shadow hover:from-indigo-400 hover:via-sky-400 hover:to-emerald-300"
+                className="mt-1 inline-flex items-center justify-center rounded-2xl bg-linear-to-r from-indigo-500 via-sky-500 to-emerald-400 px-4 py-2 text-xs font-medium text-white shadow transition hover:from-indigo-400 hover:via-sky-400 hover:to-emerald-300"
               >
                 Generate your first report
               </button>
@@ -104,7 +104,7 @@ const Allresult = () => {
                 return (
                   <article
                     key={report._id}
-                    className="group flex flex-col md:flex-row md:items-center gap-3 rounded-2xl border border-slate-800/80 bg-slate-950/60 px-4 py-4 hover:border-indigo-400/70 hover:bg-slate-900/70 transition-colors"
+                    className="group flex flex-col gap-3 rounded-2xl border border-slate-800/80 bg-slate-950/60 px-4 py-4 transition-colors hover:border-indigo-400/70 hover:bg-slate-900/70 md:flex-row md:items-center"
                   >
                     <div className="flex-1 space-y-1">
                       <p className="text-[0.7rem] font-semibold uppercase tracking-[0.16em] text-slate-500">
@@ -120,9 +120,9 @@ const Allresult = () => {
                       )}
                     </div>
 
-                    <div className="flex flex-row md:flex-col items-end md:items-center gap-3 md:gap-2 md:w-40">
+                    <div className="flex flex-row items-end gap-3 md:w-40 md:flex-col md:items-center md:gap-2">
                       {typeof report.matchScore === "number" && (
-                        <div className="flex flex-col items-end md:items-center gap-1">
+                        <div className="flex flex-col items-end gap-1 md:items-center">
                           <span className="text-[0.7rem] font-semibold uppercase tracking-[0.16em] text-slate-500">
                             Match score
                           </span>
@@ -134,7 +134,7 @@ const Allresult = () => {
                       <button
                         type="button"
                         onClick={() => handleOpenReport(report._id)}
-                        className="inline-flex items-center justify-center rounded-2xl bg-indigo-500/90 px-4 py-2 text-xs font-medium text-white shadow hover:bg-indigo-400"
+                        className="inline-flex items-center justify-center rounded-2xl bg-indigo-500/90 px-4 py-2 text-xs font-medium text-white shadow transition hover:bg-indigo-400"
                       >
                         Open report
                       </button>
