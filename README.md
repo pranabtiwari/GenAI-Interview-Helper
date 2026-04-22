@@ -4,8 +4,8 @@ This project is a full-stack app with a Node/Express backend and a React (Vite) 
 
 ## Structure
 
-- `backend/` – Express API, AI integration, MongoDB models and routes
-- `frontend/` – React SPA (Vite) for login, form input, and viewing reports
+- `backend/` - Express API, AI integration, MongoDB models and routes
+- `frontend/` - React SPA (Vite) for login, form input, and viewing reports
 
 ## Getting Started
 
@@ -20,11 +20,16 @@ npm run dev
 Create a `.env` in `backend/` with at least:
 
 ```bash
-MONGO_URI=...
+MONGODB_URI=...
 JWT_KEY=...
-GEMINI_API_KEY=...
-OPENROUTE_API_KEY=...
+GROQ_API_KEY=...
 PORT=3000
+```
+
+Optional browser override for PDF generation:
+
+```bash
+CHROME_PATH=/usr/bin/google-chrome-stable
 ```
 
 ### Frontend
@@ -35,7 +40,7 @@ npm install
 npm run dev
 ```
 
-By default, the frontend expects the backend at `http://localhost:3000/api`.
+By default, the frontend expects the backend at `http://localhost:3000/api`. If you set `VITE_API_BASE_URL`, use the full API base URL, for example `http://localhost:3000/api` in development.
 
 ## Deploying On Render
 
@@ -56,14 +61,19 @@ npm start --prefix backend
 Required environment variables on Render:
 
 ```bash
-MONGO_URI=...
+MONGODB_URI=...
 JWT_KEY=...
-GEMINI_API_KEY=...
-OPENROUTE_API_KEY=...
+GROQ_API_KEY=...
 PORT=10000
 ```
 
-If you deploy the frontend separately as a Static Site, set `VITE_API_BASE_URL` to your backend URL.
+If you deploy the frontend separately as a Static Site, set `VITE_API_BASE_URL` to your backend API URL, usually ending in `/api`.
+
+## Notes
+
+- Local PDF generation auto-detects a Chrome/Chromium install on Linux.
+- On Render, the app uses the packaged Chromium path automatically.
+- The login and interview API calls default to `/api` when `VITE_API_BASE_URL` is not set.
 
 ## Features
 
