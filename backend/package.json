@@ -7,12 +7,13 @@
   "scripts": {
     "dev": "npx nodemon ./index.js",
     "start": "node ./index.js",
-    "build": "npm install --omit=dev && PUPPETEER_CACHE_DIR=.cache/puppeteer npx puppeteer browsers install chrome && npm install --prefix ../frontend && npm run build --prefix ../frontend && rm -rf ./public/* && cp -r ../frontend/dist/* ./public/"
+    "build": "npm install --omit=dev && npm install --prefix ../frontend && npm run build --prefix ../frontend && rm -rf ./public/* && cp -r ../frontend/dist/* ./public/"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@sparticuz/chromium": "^129.0.0",
     "@google/genai": "^1.47.0",
     "@openrouter/sdk": "^0.10.2",
     "bcryptjs": "^3.0.3",

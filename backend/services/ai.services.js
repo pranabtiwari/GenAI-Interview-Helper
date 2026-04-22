@@ -1,18 +1,28 @@
 import Groq from "groq-sdk";
 import puppeteer from "puppeteer";
+import puppeteerCore from "puppeteer-core";
+import chromium from "@sparticuz/chromium";
 import dotenv from "dotenv";
-import path from "path";
-import { fileURLToPath } from "url";
+import { existsSync } from "fs";
 
 dotenv.config();
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const puppeteerCacheDir = path.resolve(__dirname, "../.cache/puppeteer");
-
-process.env.PUPPETEER_CACHE_DIR = process.env.PUPPETEER_CACHE_DIR || puppeteerCacheDir;
-
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+
+const LOCAL_CHROME_CANDIDATES = [
+  "/usr/bin/chromium-browser",
+  "/usr/bin/chromium",
+  "/usr/bin/google-chrome-stable",
+  "/usr/bin/google-chrome",
+];
+
+function resolveLocalChromePath() {
+  if (process.env.CHROME_PATH) {
+    return process.env.CHROME_PATH;
+  }
+
+  return LOCAL_CHROME_CANDIDATES.find((candidate) => existsSync(candidate));
+}
 
 const INTERVIEW_REPORT_SCHEMA = {
   type: "object",
@@ -211,21 +221,42 @@ ${JSON.stringify(INTERVIEW_REPORT_SCHEMA)}`;
 }
 
 async function launchBrowser() {
-  const launchOptions = {
-    headless: "new",
-    args: [
-      "--no-sandbox",
-      "--disable-setuid-sandbox",
-      "--disable-dev-shm-usage",
-      "--disable-gpu",
-    ],
-  };
+  const isRender = Boolean(process.env.RENDER);
+  const commonArgs = [
+    "--no-sandbox",
+    "--disable-setuid-sandbox",
+    "--disable-dev-shm-usage",
+    "--disable-gpu",
+  ];
 
-  if (process.env.CHROME_PATH) {
-    launchOptions.executablePath = process.env.CHROME_PATH;
+  if (isRender) {
+    return await puppeteerCore.launch({
+      executablePath: await chromium.executablePath(),
+      args: [...chromium.args, ...commonArgs],
+      headless: true,
+    });
   }
 
-  return await puppeteer.launch(launchOptions);
+  const localExecutablePath = resolveLocalChromePath();
+
+  if (localExecutablePath) {
+    return await puppeteerCore.launch({
+      executablePath: localExecutablePath,
+      args: commonArgs,
+      headless: "new",
+    });
+  }
+
+  try {
+    return await puppeteer.launch({
+      headless: "new",
+      args: commonArgs,
+    });
+  } catch {
+    throw new Error(
+      "No local Chrome/Chromium found. Set CHROME_PATH in backend/.env or install chromium-browser/google-chrome-stable.",
+    );
+  }
 }
 
 async function generatePDFFromHTML(htmlContent) {
