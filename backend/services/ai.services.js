@@ -1,5 +1,8 @@
 import Groq from "groq-sdk";
 import puppeteer from "puppeteer-core";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
