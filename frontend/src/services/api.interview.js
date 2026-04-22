@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_BASE_URL_VALUE = import.meta.env.VITE_API_BASE_URL;
+const API_BASE_URL_VALUE = import.meta.env.VITE_API_BASE_URL || "/api";
 const API_BASE_URL = axios.create({
     baseURL: API_BASE_URL_VALUE,
     withCredentials: true,
@@ -14,7 +14,7 @@ export function generateInterviewReport({ resume, selfDescription, jobDescriptio
     form.append("resume", resume);
     form.append("selfDescription", selfDescription);
     form.append("jobDescription", jobDescription);
-    const response = API_BASE_URL.post('interview', form, {
+    const response = API_BASE_URL.post('/interview', form, {
         headers: {
             "Content-Type": "multipart/form-data",
             Authorization: `Bearer ${token}`,
@@ -26,7 +26,7 @@ export function generateInterviewReport({ resume, selfDescription, jobDescriptio
 
 export function getInterviewReportById(interviewId) {
     const token = localStorage.getItem('token');
-    const response = API_BASE_URL.get(`interview/${interviewId}`, {
+    const response = API_BASE_URL.get(`/interview/${interviewId}`, {
         headers: {
             Authorization: `Bearer ${token}`,
         }
@@ -36,7 +36,7 @@ export function getInterviewReportById(interviewId) {
 
 export function getAllInterviewReports() {
     const token = localStorage.getItem('token');
-    const response = API_BASE_URL.get('interview', {
+    const response = API_BASE_URL.get('/interview', {
         headers: {
             Authorization: `Bearer ${token}`,
         }
@@ -46,7 +46,7 @@ export function getAllInterviewReports() {
 
 export function generateInterviewReportPDF(interviewId) {
     const token = localStorage.getItem('token');
-    const response = API_BASE_URL.post(`resume/pdf/${interviewId}`, null, {
+    const response = API_BASE_URL.post(`/resume/pdf/${interviewId}`, null, {
         headers: {
             Authorization: `Bearer ${token}`,
         },
