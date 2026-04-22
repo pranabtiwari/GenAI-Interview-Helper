@@ -1,8 +1,16 @@
 import Groq from "groq-sdk";
 import puppeteer from "puppeteer";
 import dotenv from "dotenv";
+import path from "path";
+import { fileURLToPath } from "url";
 
 dotenv.config();
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const puppeteerCacheDir = path.resolve(__dirname, "../.cache/puppeteer");
+
+process.env.PUPPETEER_CACHE_DIR = process.env.PUPPETEER_CACHE_DIR || puppeteerCacheDir;
 
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
