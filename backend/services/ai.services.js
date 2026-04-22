@@ -149,7 +149,9 @@ function safeParseModelJSON(content) {
     return content;
   }
 
-  const cleaned = String(content).replace(/```json|```/g, "").trim();
+  const cleaned = String(content)
+    .replace(/```json|```/g, "")
+    .trim();
 
   try {
     return JSON.parse(cleaned);
@@ -296,8 +298,7 @@ async function generateHTMLFromAI(prompt) {
         {
           role: "user",
           content:
-            prompt +
-            "\n\nReturn ONLY clean HTML. No markdown. No explanation.",
+            prompt + "\n\nReturn ONLY clean HTML. No markdown. No explanation.",
         },
       ],
       temperature: 0.7,
@@ -325,15 +326,60 @@ export async function generateInterviewReportPDF({
   jobDescription,
 }) {
   const prompt = `
-Create a professional resume using:
+You are an expert resume writer and ATS optimization specialist.
 
-Resume: ${resume}
-Self Description: ${selfDescription}
-Job Description: ${jobDescription}
+Create a professional, ATS-friendly resume based on the following inputs.
 
-- Clean layout
-- Sections: Summary, Skills, Experience, Education
-- Minimal styling
+### INPUT DATA
+Resume (raw): 
+${resume}
+
+Candidate Self Description:
+${selfDescription}
+
+Target Job Description:
+${jobDescription}
+
+---
+
+### REQUIREMENTS
+
+1. Output MUST be clean, semantic HTML (no markdown).
+2. Use minimal inline CSS for styling (professional, readable).
+3. Use proper sections:
+
+- Header (Name, Email, Phone, LinkedIn if available)
+- Professional Summary (tailored to job description)
+- Skills (categorized, keyword-optimized for ATS)
+- Experience (bullet points with action verbs + impact)
+- Projects (if relevant)
+- Education
+
+4. Optimize content for ATS:
+- Include relevant keywords from job description
+- Use strong action verbs (Built, Developed, Implemented, Designed)
+- Quantify impact where possible
+
+5. Keep formatting clean:
+- Use <h1>, <h2>, <ul>, <li>, <p>
+- No excessive styling, no colors
+- Professional spacing
+
+6. Do NOT hallucinate:
+- Only use provided data
+- If data missing, omit section
+
+7. Keep it concise (1 page max if possible)
+
+---
+
+### OUTPUT FORMAT
+
+Return ONLY valid HTML:
+- Wrapped in <html>, <head>, <body>
+- Inline CSS allowed
+- No explanations, no extra text
+
 `;
 
   try {
