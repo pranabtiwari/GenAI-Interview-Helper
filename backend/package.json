@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "npx nodemon ./index.js",
     "start": "node ./index.js",
-    "build": "npm install --omit=dev && npm install --prefix ../frontend && npm run build --prefix ../frontend && rm -rf ./public/* && cp -r ../frontend/dist/* ./public/"
+    "build": "npm install --omit=dev && npx puppeteer browsers install chrome && npm install --prefix ../frontend && npm run build --prefix ../frontend && rm -rf ./public/* && cp -r ../frontend/dist/* ./public/"
   },
   "keywords": [],
   "author": "",
