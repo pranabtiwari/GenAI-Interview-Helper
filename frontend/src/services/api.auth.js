@@ -56,6 +56,17 @@ export const forgetPassword = async (data) => {
   return response.data;
 };
 
+export async function resetPassword({ token, password }) {
+  const response = await API_BASE_URL.post(
+    `auth/reset-password/${encodeURIComponent(token)}`,
+    {
+      password,
+    },
+  );
+
+  return response.data;
+}
+
 // export async function getMePage(){
 //     try {
 //         const token = localStorage.getItem('token')

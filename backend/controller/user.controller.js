@@ -3,6 +3,7 @@ import { registerSchema, loginSchema } from "../schema/user.schema.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
+import sendResetPasswordMail from "../services/mailerGmail.js";
 
 async function registerAuthController(req, res) {
   try {
@@ -160,10 +161,8 @@ async function userForgetPasswordController(req, res) {
     user.resetPasswordExpires = Date.now() + 10 * 60 * 1000; // expires in 10 minutes
     await user.save();
     const resetLink = `http://localhost:5173/reset-password/${resetToken}`;
-
-    console.log(resetLink);
-
-    // Later send email here
+    
+    await sendResetPasswordMail(user.email, resetLink);
 
     return res.status(200).json({
       message: "Password reset link generated",
