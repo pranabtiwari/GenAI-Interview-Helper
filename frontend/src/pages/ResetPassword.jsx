@@ -3,15 +3,18 @@ import { useMutation } from "@tanstack/react-query";
 import { useParams } from "react-router";
 import { useState } from "react";
 import { resetPassword } from "../services/api.auth";
+import { useNavigate } from "react-router";
 
 const ResetPassword = () => {
   const { token } = useParams();
   const [password, setPassword] = useState("");
+  const navigation = useNavigate()
 
   const mutation = useMutation({
     mutationFn: resetPassword,
     onSuccess: (data) => {
       console.log(data);
+      navigation('/login')
     },
     onError: (error) => {
       console.log(error);
