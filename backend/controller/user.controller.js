@@ -160,8 +160,9 @@ async function userForgetPasswordController(req, res) {
     user.resetPasswordToken = resetToken;
     user.resetPasswordExpires = Date.now() + 10 * 60 * 1000; // expires in 10 minutes
     await user.save();
-    const resetLink = `http://localhost:5173/reset-password/${resetToken}`;
-    
+    const frontendUrl = process.env.FRONTEND_URL;
+    const resetLink = `${frontendUrl}/reset-password/${resetToken}`;
+
     await sendResetPasswordMail(user.email, resetLink);
 
     return res.status(200).json({
@@ -232,5 +233,5 @@ export default {
   userLoginController,
   userLogOutController,
   userForgetPasswordController,
-  resetPasswordController
+  resetPasswordController,
 };
