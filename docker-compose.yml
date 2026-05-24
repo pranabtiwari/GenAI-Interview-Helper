@@ -1,11 +1,11 @@
 version: "3.9"
 
-
 services:
-  backend:
+  app:
     build:
-      context: ./backend
-    container_name: backend
+      context: .
+      dockerfile: Dockerfile
+    container_name: genai-app
     env_file:
       - ./backend/.env
     environment:
@@ -13,14 +13,3 @@ services:
     ports:
       - "3000:3000"
     restart: unless-stopped
-
-  frontend:
-    build:
-      context: ./frontend
-    container_name: frontend
-    depends_on:
-      - backend
-    ports:
-      - "5173:80"
-    restart: unless-stopped
-

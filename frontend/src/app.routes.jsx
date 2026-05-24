@@ -6,6 +6,8 @@ import { ProtectedRoutes } from "./components/protectedRoutes";
 import Interview from "./pages/interview";
 import Allresult from "./pages/Allresult";
 import NavBar from "./components/NavBar";
+import ForgetPassword from "./pages/ForgetPassword";
+import ResetPassword from "./pages/ResetPassword";
 
 export const router = createBrowserRouter([
   {
@@ -15,6 +17,14 @@ export const router = createBrowserRouter([
   {
     path: "/login",
     element: <Login />,
+  },
+  {
+    path: "/forgot-password",
+    element: <ForgetPassword />,
+  },
+  {
+    path: "/reset-password/:token",
+    element: <ResetPassword />,
   },
   {
     element: <NavBar />,

@@ -2,6 +2,8 @@ import userModel from "../model/user.model.js";
 import { registerSchema, loginSchema } from "../schema/user.schema.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import crypto from "crypto";
+import sendResetPasswordMail from "../services/mailerGmail.js";
 
 async function registerAuthController(req, res) {
   try {
@@ -140,6 +142,80 @@ async function userLoginController(req, res) {
   }
 }
 
+async function userForgetPasswordController(req, res) {
+  try {
+    const { email } = req.body;
+    if (!email) {
+      return res.status(400).json({
+        message: "Please enter the User Credentials",
+      });
+    }
+    const user = await userModel.findOne({ email });
+    if (!user) {
+      return res.status(400).json({
+        message: "User not found",
+      });
+    }
+    const resetToken = crypto.randomBytes(32).toString("hex");
+    user.resetPasswordToken = resetToken;
+    user.resetPasswordExpires = Date.now() + 10 * 60 * 1000; // expires in 10 minutes
+    await user.save();
+    const frontendUrl = process.env.FRONTEND_URL;
+    const resetLink = `${frontendUrl}/reset-password/${resetToken}`;
+
+    await sendResetPasswordMail(user.email, resetLink);
+
+    return res.status(200).json({
+      message: "Password reset link generated",
+      resetLink,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: "Internal server error",
+      error: error.message,
+    });
+  }
+}
+
+async function resetPasswordController(req, res) {
+  try {
+    const { token } = req.params;
+
+    const { password } = req.body;
+
+    const user = await userModel.findOne({
+      resetPasswordToken: token,
+      resetPasswordExpires: { $gt: Date.now() },
+    });
+
+    if (!user) {
+      return res.status(400).json({
+        message: "Invalid or expired token",
+      });
+    }
+
+    // Hash password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    user.password = hashedPassword;
+
+    // Remove token after use
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpires = undefined;
+
+    await user.save();
+
+    return res.status(200).json({
+      message: "Password reset successful",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: "Internal server error",
+      error: error.message,
+    });
+  }
+}
+
 async function userLogOutController(req, res) {
   try {
     return res.status(200).json({
@@ -156,4 +232,6 @@ export default {
   registerAuthController,
   userLoginController,
   userLogOutController,
+  userForgetPasswordController,
+  resetPasswordController,
 };
