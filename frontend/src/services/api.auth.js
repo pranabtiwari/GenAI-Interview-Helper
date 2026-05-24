@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_BASE_URL_VALUE = import.meta.env.VITE_API_BASE_URL;
+const API_BASE_URL_VALUE = import.meta.env.VITE_API_BASE_URL || "/api";
 const API_BASE_URL = axios.create({
   baseURL: API_BASE_URL_VALUE,
   withCredentials: true,
@@ -51,14 +51,14 @@ export async function authLogout() {
 
 // API function
 export const forgetPassword = async (data) => {
-  const response = await API_BASE_URL.post("auth/forgot-password", data);
+  const response = await API_BASE_URL.post("/auth/forgot-password", data);
 
   return response.data;
 };
 
 export async function resetPassword({ token, password }) {
   const response = await API_BASE_URL.post(
-    `auth/reset-password/${encodeURIComponent(token)}`,
+    `/auth/reset-password/${encodeURIComponent(token)}`,
     {
       password,
     },
